@@ -1,1 +1,1 @@
-# Hotel_SpringBoot_Application
+# Hotel_Manager_Application
