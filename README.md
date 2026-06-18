@@ -2,7 +2,7 @@
 
 **Hotel Manager Application** — это приложение для управления гостиницей, предоставляющее интерфейс для работы с гостями, номерами, бронированиями, сотрудниками и их должностями, услугами и платежами.
 
-Ссылка на SonarCloud: https://sonarcloud.io/project/configuration?id=Warnabis_Hotel_Manager_Application
+Ссылка на SonarCloud: https://sonarcloud.io/summary/new_code?id=Warnabis_Hotel_Manager_Application&branch=jdbc
 
 ## Этапы выполнения
 
