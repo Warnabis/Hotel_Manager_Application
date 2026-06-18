@@ -35,7 +35,7 @@ public class RoomDAO implements BaseDAO<Room> {
     @Override
     public List<Room> findAll() throws SQLException {
         List<Room> rooms = new ArrayList<>();
-        String sql = "SELECT * FROM public.room ORDER BY id";
+        String sql = "SELECT id, floor, status, type, price FROM public.room ORDER BY id";
 
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
@@ -55,7 +55,7 @@ public class RoomDAO implements BaseDAO<Room> {
 
     @Override
     public Room findById(int id) throws SQLException {
-        String sql = "SELECT * FROM public.room WHERE id = ?";
+        String sql = "SELECT id, floor, status, type, price FROM public.room WHERE id = ?";
 
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, id);

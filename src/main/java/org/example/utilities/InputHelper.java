@@ -1,11 +1,13 @@
 package org.example.utilities;
 
+import lombok.extern.slf4j.Slf4j;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Scanner;
 
+@Slf4j
 public class InputHelper {
 
     private static final Scanner scanner = new Scanner(System.in);
@@ -13,57 +15,56 @@ public class InputHelper {
 
     public static String readNonEmptyString(String prompt) {
         while (true) {
-            System.out.print(prompt);
+            log.info(prompt);
             String input = scanner.nextLine().trim();
             if (!input.isEmpty()) {
                 return input;
             }
-            System.out.println("Ошибка: поле не может быть пустым");
+            log.warn("Ошибка: поле не может быть пустым");
         }
     }
 
     public static int readInt(String prompt) {
         while (true) {
-            System.out.print(prompt);
+            log.info(prompt);
             try {
                 return Integer.parseInt(scanner.nextLine().trim());
             } catch (NumberFormatException e) {
-                System.out.println("Ошибка: введите целое число");
+                log.warn("Ошибка: введите целое число");
             }
         }
     }
 
     public static BigDecimal readBigDecimal(String prompt) {
         while (true) {
-            System.out.print(prompt);
+            log.info(prompt);
             try {
                 return new BigDecimal(scanner.nextLine().trim());
             } catch (NumberFormatException e) {
-                System.out.println("Ошибка: введите корректное число");
+                log.warn("Ошибка: введите корректное число");
             }
         }
     }
 
     public static LocalDate readLocalDate(String prompt) {
         while (true) {
-            System.out.print(prompt);
+            log.info(prompt);
             try {
                 return LocalDate.parse(scanner.nextLine().trim(), DATE_FORMATTER);
             } catch (DateTimeParseException e) {
-                System.out.println("Ошибка: неверный формат даты. Используйте формат yyyy-MM-dd");
+                log.warn("Ошибка: неверный формат даты. Используйте формат yyyy-MM-dd");
             }
         }
     }
 
-
     public static String readOptionalString(String prompt) {
-        System.out.print(prompt);
+        log.info(prompt);
         return scanner.nextLine().trim();
     }
 
     public static int readOptionalInt(String prompt, int defaultValue) {
         while (true) {
-            System.out.print(prompt);
+            log.info(prompt);
             String input = scanner.nextLine().trim();
             if (input.isEmpty()) {
                 return defaultValue;
@@ -71,14 +72,14 @@ public class InputHelper {
             try {
                 return Integer.parseInt(input);
             } catch (NumberFormatException e) {
-                System.out.println("Ошибка: введите целое число или оставьте пустым для пропуска");
+                log.warn("Ошибка: введите целое число или оставьте пустым для пропуска");
             }
         }
     }
 
     public static BigDecimal readOptionalBigDecimal(String prompt, BigDecimal defaultValue) {
         while (true) {
-            System.out.print(prompt);
+            log.info(prompt);
             String input = scanner.nextLine().trim();
             if (input.isEmpty()) {
                 return defaultValue;
@@ -86,14 +87,14 @@ public class InputHelper {
             try {
                 return new BigDecimal(input);
             } catch (NumberFormatException e) {
-                System.out.println("Ошибка: введите корректное число или оставьте пустым для пропуска");
+                log.warn("Ошибка: введите корректное число или оставьте пустым для пропуска");
             }
         }
     }
 
     public static LocalDate readOptionalLocalDate(String prompt, LocalDate defaultValue) {
         while (true) {
-            System.out.print(prompt);
+            log.info(prompt);
             String input = scanner.nextLine().trim();
             if (input.isEmpty()) {
                 return defaultValue;
@@ -101,30 +102,29 @@ public class InputHelper {
             try {
                 return LocalDate.parse(input, DATE_FORMATTER);
             } catch (DateTimeParseException e) {
-                System.out.println("Ошибка: неверный формат даты. Используйте yyyy-MM-dd или оставьте пустым для пропуска");
+                log.warn("Ошибка: неверный формат даты. Используйте yyyy-MM-dd или оставьте пустым для пропуска");
             }
         }
     }
 
-
     public static int readMenuChoice(String prompt) {
         while (true) {
-            System.out.print(prompt);
+            log.info(prompt);
             try {
                 int choice = Integer.parseInt(scanner.nextLine().trim());
                 if (choice >= 0) {
                     return choice;
                 }
-                System.out.println("Ошибка: введите неотрицательное число");
+                log.warn("Ошибка: введите неотрицательное число");
             } catch (NumberFormatException e) {
-                System.out.println("Ошибка: введите номер пункта меню");
+                log.warn("Ошибка: введите номер пункта меню");
             }
         }
     }
 
     public static boolean confirmAction(String prompt) {
         while (true) {
-            System.out.print(prompt + " (y/n): ");
+            log.info(prompt + " (y/n): ");
             String input = scanner.nextLine().trim().toLowerCase();
             if (input.equals("y") || input.equals("yes")) {
                 return true;
@@ -132,7 +132,7 @@ public class InputHelper {
             if (input.equals("n") || input.equals("no")) {
                 return false;
             }
-            System.out.println("Ошибка: введите y или n");
+            log.warn("Ошибка: введите y или n");
         }
     }
 }

@@ -39,7 +39,7 @@ public class PaymentDAO implements BaseDAO<Payment> {
     @Override
     public List<Payment> findAll() throws SQLException {
         List<Payment> payments = new ArrayList<>();
-        String sql = "SELECT * FROM public.payment ORDER BY id";
+        String sql = "SELECT id, status, amount, date, method, guest_id FROM public.payment ORDER BY id";
 
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
@@ -60,7 +60,7 @@ public class PaymentDAO implements BaseDAO<Payment> {
 
     @Override
     public Payment findById(int id) throws SQLException {
-        String sql = "SELECT * FROM public.payment WHERE id = ?";
+        String sql = "SELECT id, status, amount, date, method, guest_id FROM public.payment WHERE id = ?";
 
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, id);
@@ -105,5 +105,4 @@ public class PaymentDAO implements BaseDAO<Payment> {
             pstmt.executeUpdate();
         }
     }
-
 }

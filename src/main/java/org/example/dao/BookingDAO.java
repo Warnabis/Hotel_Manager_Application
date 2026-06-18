@@ -44,7 +44,7 @@ public class BookingDAO implements BaseDAO<Booking> {
     @Override
     public List<Booking> findAll() throws SQLException {
         List<Booking> bookings = new ArrayList<>();
-        String sql = "SELECT * FROM public.booking ORDER BY id";
+        String sql = "SELECT id, price, status, check_in, duration, guest_id FROM public.booking ORDER BY id";
 
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
@@ -65,7 +65,7 @@ public class BookingDAO implements BaseDAO<Booking> {
 
     @Override
     public Booking findById(int id) throws SQLException {
-        String sql = "SELECT * FROM public.booking WHERE id = ?";
+        String sql = "SELECT id, price, status, check_in, duration, guest_id FROM public.booking WHERE id = ?";
 
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, id);

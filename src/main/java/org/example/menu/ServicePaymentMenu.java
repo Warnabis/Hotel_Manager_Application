@@ -1,5 +1,6 @@
 package org.example.menu;
 
+import lombok.extern.slf4j.Slf4j;
 import org.example.dao.ServicePaymentDAO;
 import org.example.models.ServicePayment;
 import org.example.models.Payment;
@@ -8,29 +9,42 @@ import org.example.utilities.InputHelper;
 import java.sql.SQLException;
 import java.util.List;
 
+@Slf4j
 public class ServicePaymentMenu {
 
+    private static final String MSG_RELATION_EXISTS = "Такая связь уже существует!";
+    private static final String MSG_RELATION_CREATED = "Связь создана! ID: ";
+    private static final String MSG_NO_RELATIONS = "Связей не найдено";
+    private static final String MSG_TOTAL = "Всего: ";
+    private static final String MSG_NOT_FOUND = "Связь не найдена!";
+    private static final String MSG_UPDATED = "Связь обновлена!";
+    private static final String MSG_NO_CHANGES = "Изменений не было.";
+    private static final String MSG_DELETED = "Связь удалена!";
+    private static final String MSG_DELETE_CANCELLED = "Удаление отменено.";
+    private static final String MSG_SERVICES_DELETED = "Все связи услуги удалены!";
+    private static final String MSG_PAYMENTS_DELETED = "Все связи платежа удалены!";
+
     public static void create(ServicePaymentDAO dao) throws SQLException {
-        System.out.println("\n--- Добавление связи услуга-платеж ---");
+        log.info("\n--- Добавление связи услуга-платеж ---");
         int serviceId = InputHelper.readInt("ID услуги: ");
         int paymentId = InputHelper.readInt("ID платежа: ");
         if (!dao.exists(serviceId, paymentId)) {
             ServicePayment relation = new ServicePayment(serviceId, paymentId);
             dao.create(relation);
-            System.out.println("Связь создана! ID: " + relation.getId());
+            log.info(MSG_RELATION_CREATED + relation.getId());
         } else {
-            System.out.println("Такая связь уже существует!");
+            log.warn(MSG_RELATION_EXISTS);
         }
     }
 
     public static void findAll(ServicePaymentDAO dao) throws SQLException {
-        System.out.println("\n--- Все связи услуга-платеж ---");
+        log.info("\n--- Все связи услуга-платеж ---");
         List<ServicePayment> relations = dao.findAll();
         if (relations.isEmpty()) {
-            System.out.println("Связей не найдено");
+            log.info(MSG_NO_RELATIONS);
         } else {
-            relations.forEach(System.out::println);
-            System.out.println("Всего: " + relations.size());
+            relations.forEach(relation -> log.info(relation.toString()));
+            log.info(MSG_TOTAL + relations.size());
         }
     }
 
@@ -38,9 +52,9 @@ public class ServicePaymentMenu {
         int id = InputHelper.readInt("Введите ID связи: ");
         ServicePayment relation = dao.findById(id);
         if (relation != null) {
-            System.out.println(relation);
+            log.info(relation.toString());
         } else {
-            System.out.println("Связь не найдена!");
+            log.warn(MSG_NOT_FOUND);
         }
     }
 
@@ -48,21 +62,19 @@ public class ServicePaymentMenu {
         int id = InputHelper.readInt("Введите ID связи для обновления: ");
         ServicePayment relation = dao.findById(id);
         if (relation == null) {
-            System.out.println("Связь не найдена!");
+            log.warn(MSG_NOT_FOUND);
             return;
         }
-        System.out.println("Текущие данные: " + relation);
-
+        log.info("Текущие данные: {}", relation);
         int newServiceId = InputHelper.readOptionalInt("Новый ID услуги [" + relation.getServiceId() + "]: ", relation.getServiceId());
         int newPaymentId = InputHelper.readOptionalInt("Новый ID платежа [" + relation.getPaymentId() + "]: ", relation.getPaymentId());
-
         if (newServiceId != relation.getServiceId() || newPaymentId != relation.getPaymentId()) {
             relation.setServiceId(newServiceId);
             relation.setPaymentId(newPaymentId);
             dao.update(relation);
-            System.out.println("Связь обновлена!");
+            log.info(MSG_UPDATED);
         } else {
-            System.out.println("Изменений не было.");
+            log.info(MSG_NO_CHANGES);
         }
     }
 
@@ -70,38 +82,38 @@ public class ServicePaymentMenu {
         int id = InputHelper.readInt("Введите ID связи для удаления: ");
         ServicePayment relation = dao.findById(id);
         if (relation == null) {
-            System.out.println("Связь не найдена!");
+            log.warn(MSG_NOT_FOUND);
             return;
         }
         if (InputHelper.confirmAction("Удалить связь " + relation)) {
             dao.delete(id);
-            System.out.println("Связь удалена!");
+            log.info(MSG_DELETED);
         } else {
-            System.out.println("Удаление отменено.");
+            log.info(MSG_DELETE_CANCELLED);
         }
     }
 
     public static void showPaymentsByService(ServicePaymentDAO dao) throws SQLException {
         int serviceId = InputHelper.readInt("Введите ID услуги: ");
-        System.out.println("\n--- Платежи услуги ---");
+        log.info("\n--- Платежи услуги ---");
         List<Payment> payments = dao.getPaymentsByServiceId(serviceId);
         if (payments.isEmpty()) {
-            System.out.println("Платежи не найдены");
+            log.info("Платежи не найдены");
         } else {
-            payments.forEach(System.out::println);
-            System.out.println("Всего: " + payments.size());
+            payments.forEach(payment -> log.info(payment.toString()));
+            log.info(MSG_TOTAL + payments.size());
         }
     }
 
     public static void showServicesByPayment(ServicePaymentDAO dao) throws SQLException {
         int paymentId = InputHelper.readInt("Введите ID платежа: ");
-        System.out.println("\n--- Услуги платежа ---");
+        log.info("\n--- Услуги платежа ---");
         List<Service> services = dao.getServicesByPaymentId(paymentId);
         if (services.isEmpty()) {
-            System.out.println("Услуги не найдены");
+            log.info("Услуги не найдены");
         } else {
-            services.forEach(System.out::println);
-            System.out.println("Всего: " + services.size());
+            services.forEach(service -> log.info(service.toString()));
+            log.info(MSG_TOTAL + services.size());
         }
     }
 
@@ -109,9 +121,9 @@ public class ServicePaymentMenu {
         int serviceId = InputHelper.readInt("Введите ID услуги: ");
         if (InputHelper.confirmAction("Удалить все связи услуги")) {
             dao.deleteByServiceId(serviceId);
-            System.out.println("Все связи услуги удалены!");
+            log.info(MSG_SERVICES_DELETED);
         } else {
-            System.out.println("Удаление отменено.");
+            log.info(MSG_DELETE_CANCELLED);
         }
     }
 
@@ -119,9 +131,9 @@ public class ServicePaymentMenu {
         int paymentId = InputHelper.readInt("Введите ID платежа: ");
         if (InputHelper.confirmAction("Удалить все связи платежа")) {
             dao.deleteByPaymentId(paymentId);
-            System.out.println("Все связи платежа удалены!");
+            log.info(MSG_PAYMENTS_DELETED);
         } else {
-            System.out.println("Удаление отменено.");
+            log.info(MSG_DELETE_CANCELLED);
         }
     }
 }

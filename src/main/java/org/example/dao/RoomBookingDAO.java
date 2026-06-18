@@ -44,7 +44,7 @@ public class RoomBookingDAO implements BaseDAO<RoomBooking> {
     @Override
     public List<RoomBooking> findAll() throws SQLException {
         List<RoomBooking> relations = new ArrayList<>();
-        String sql = "SELECT * FROM public.room_booking ORDER BY id";
+        String sql = "SELECT id, room_id, booking_id FROM public.room_booking ORDER BY id";
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
@@ -60,7 +60,7 @@ public class RoomBookingDAO implements BaseDAO<RoomBooking> {
 
     @Override
     public RoomBooking findById(int id) throws SQLException {
-        String sql = "SELECT * FROM public.room_booking WHERE id = ?";
+        String sql = "SELECT id, room_id, booking_id FROM public.room_booking WHERE id = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             try (ResultSet rs = pstmt.executeQuery()) {
@@ -88,7 +88,7 @@ public class RoomBookingDAO implements BaseDAO<RoomBooking> {
     public List<Room> getRoomsByBookingId(int bookingId) throws SQLException {
         List<Room> rooms = new ArrayList<>();
         String sql = """
-            SELECT r.* FROM public.room r
+            SELECT r.id, r.floor, r.status, r.type, r.price FROM public.room r
             JOIN public.room_booking rb ON r.id = rb.room_id
             WHERE rb.booking_id = ?
             ORDER BY r.id
@@ -113,7 +113,7 @@ public class RoomBookingDAO implements BaseDAO<RoomBooking> {
     public List<Booking> getBookingsByRoomId(int roomId) throws SQLException {
         List<Booking> bookings = new ArrayList<>();
         String sql = """
-            SELECT b.* FROM public.booking b
+            SELECT b.id, b.price, b.status, b.check_in, b.duration, b.guest_id FROM public.booking b
             JOIN public.room_booking rb ON b.id = rb.booking_id
             WHERE rb.room_id = ?
             ORDER BY b.id

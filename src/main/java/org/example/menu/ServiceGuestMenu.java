@@ -1,5 +1,6 @@
 package org.example.menu;
 
+import lombok.extern.slf4j.Slf4j;
 import org.example.dao.ServiceGuestDAO;
 import org.example.models.ServiceGuest;
 import org.example.models.Guest;
@@ -8,29 +9,42 @@ import org.example.utilities.InputHelper;
 import java.sql.SQLException;
 import java.util.List;
 
+@Slf4j
 public class ServiceGuestMenu {
 
+    private static final String MSG_RELATION_EXISTS = "Такая связь уже существует!";
+    private static final String MSG_RELATION_CREATED = "Связь создана! ID: ";
+    private static final String MSG_NO_RELATIONS = "Связей не найдено";
+    private static final String MSG_TOTAL = "Всего: ";
+    private static final String MSG_NOT_FOUND = "Связь не найдена!";
+    private static final String MSG_UPDATED = "Связь обновлена!";
+    private static final String MSG_NO_CHANGES = "Изменений не было.";
+    private static final String MSG_DELETED = "Связь удалена!";
+    private static final String MSG_DELETE_CANCELLED = "Удаление отменено.";
+    private static final String MSG_SERVICES_DELETED = "Все связи услуги удалены!";
+    private static final String MSG_GUESTS_DELETED = "Все связи гостя удалены!";
+
     public static void create(ServiceGuestDAO dao) throws SQLException {
-        System.out.println("\n--- Добавление связи услуга-гость ---");
+        log.info("\n--- Добавление связи услуга-гость ---");
         int serviceId = InputHelper.readInt("ID услуги: ");
         int guestId = InputHelper.readInt("ID гостя: ");
         if (!dao.exists(serviceId, guestId)) {
             ServiceGuest relation = new ServiceGuest(serviceId, guestId);
             dao.create(relation);
-            System.out.println("Связь создана! ID: " + relation.getId());
+            log.info(MSG_RELATION_CREATED + relation.getId());
         } else {
-            System.out.println("Такая связь уже существует!");
+            log.warn(MSG_RELATION_EXISTS);
         }
     }
 
     public static void findAll(ServiceGuestDAO dao) throws SQLException {
-        System.out.println("\n--- Все связи услуга-гость ---");
+        log.info("\n--- Все связи услуга-гость ---");
         List<ServiceGuest> relations = dao.findAll();
         if (relations.isEmpty()) {
-            System.out.println("Связей не найдено");
+            log.info(MSG_NO_RELATIONS);
         } else {
-            relations.forEach(System.out::println);
-            System.out.println("Всего: " + relations.size());
+            relations.forEach(relation -> log.info(relation.toString()));
+            log.info(MSG_TOTAL + relations.size());
         }
     }
 
@@ -38,9 +52,9 @@ public class ServiceGuestMenu {
         int id = InputHelper.readInt("Введите ID связи: ");
         ServiceGuest relation = dao.findById(id);
         if (relation != null) {
-            System.out.println(relation);
+            log.info(relation.toString());
         } else {
-            System.out.println("Связь не найдена!");
+            log.warn(MSG_NOT_FOUND);
         }
     }
 
@@ -48,21 +62,19 @@ public class ServiceGuestMenu {
         int id = InputHelper.readInt("Введите ID связи для обновления: ");
         ServiceGuest relation = dao.findById(id);
         if (relation == null) {
-            System.out.println("Связь не найдена!");
+            log.warn(MSG_NOT_FOUND);
             return;
         }
-        System.out.println("Текущие данные: " + relation);
-
+        log.info("Текущие данные: {}", relation);
         int newServiceId = InputHelper.readOptionalInt("Новый ID услуги [" + relation.getServiceId() + "]: ", relation.getServiceId());
         int newGuestId = InputHelper.readOptionalInt("Новый ID гостя [" + relation.getGuestId() + "]: ", relation.getGuestId());
-
         if (newServiceId != relation.getServiceId() || newGuestId != relation.getGuestId()) {
             relation.setServiceId(newServiceId);
             relation.setGuestId(newGuestId);
             dao.update(relation);
-            System.out.println("Связь обновлена!");
+            log.info(MSG_UPDATED);
         } else {
-            System.out.println("Изменений не было.");
+            log.info(MSG_NO_CHANGES);
         }
     }
 
@@ -70,38 +82,38 @@ public class ServiceGuestMenu {
         int id = InputHelper.readInt("Введите ID связи для удаления: ");
         ServiceGuest relation = dao.findById(id);
         if (relation == null) {
-            System.out.println("Связь не найдена!");
+            log.warn(MSG_NOT_FOUND);
             return;
         }
         if (InputHelper.confirmAction("Удалить связь " + relation)) {
             dao.delete(id);
-            System.out.println("Связь удалена!");
+            log.info(MSG_DELETED);
         } else {
-            System.out.println("Удаление отменено.");
+            log.info(MSG_DELETE_CANCELLED);
         }
     }
 
     public static void showGuestsByService(ServiceGuestDAO dao) throws SQLException {
         int serviceId = InputHelper.readInt("Введите ID услуги: ");
-        System.out.println("\n--- Гости услуги ---");
+        log.info("\n--- Гости услуги ---");
         List<Guest> guests = dao.getGuestsByServiceId(serviceId);
         if (guests.isEmpty()) {
-            System.out.println("Гости не найдены");
+            log.info("Гости не найдены");
         } else {
-            guests.forEach(System.out::println);
-            System.out.println("Всего: " + guests.size());
+            guests.forEach(guest -> log.info(guest.toString()));
+            log.info(MSG_TOTAL + guests.size());
         }
     }
 
     public static void showServicesByGuest(ServiceGuestDAO dao) throws SQLException {
         int guestId = InputHelper.readInt("Введите ID гостя: ");
-        System.out.println("\n--- Услуги гостя ---");
+        log.info("\n--- Услуги гостя ---");
         List<Service> services = dao.getServicesByGuestId(guestId);
         if (services.isEmpty()) {
-            System.out.println("Услуги не найдены");
+            log.info("Услуги не найдены");
         } else {
-            services.forEach(System.out::println);
-            System.out.println("Всего: " + services.size());
+            services.forEach(service -> log.info(service.toString()));
+            log.info(MSG_TOTAL + services.size());
         }
     }
 
@@ -109,9 +121,9 @@ public class ServiceGuestMenu {
         int serviceId = InputHelper.readInt("Введите ID услуги: ");
         if (InputHelper.confirmAction("Удалить все связи услуги")) {
             dao.deleteByServiceId(serviceId);
-            System.out.println("Все связи услуги удалены!");
+            log.info(MSG_SERVICES_DELETED);
         } else {
-            System.out.println("Удаление отменено.");
+            log.info(MSG_DELETE_CANCELLED);
         }
     }
 
@@ -119,9 +131,9 @@ public class ServiceGuestMenu {
         int guestId = InputHelper.readInt("Введите ID гостя: ");
         if (InputHelper.confirmAction("Удалить все связи гостя")) {
             dao.deleteByGuestId(guestId);
-            System.out.println("Все связи гостя удалены!");
+            log.info(MSG_GUESTS_DELETED);
         } else {
-            System.out.println("Удаление отменено.");
+            log.info(MSG_DELETE_CANCELLED);
         }
     }
 }

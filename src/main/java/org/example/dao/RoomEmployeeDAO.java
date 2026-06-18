@@ -44,7 +44,7 @@ public class RoomEmployeeDAO implements BaseDAO<RoomEmployee> {
     @Override
     public List<RoomEmployee> findAll() throws SQLException {
         List<RoomEmployee> relations = new ArrayList<>();
-        String sql = "SELECT * FROM public.room_employee ORDER BY id";
+        String sql = "SELECT id, room_id, employee_id FROM public.room_employee ORDER BY id";
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
@@ -60,7 +60,7 @@ public class RoomEmployeeDAO implements BaseDAO<RoomEmployee> {
 
     @Override
     public RoomEmployee findById(int id) throws SQLException {
-        String sql = "SELECT * FROM public.room_employee WHERE id = ?";
+        String sql = "SELECT id, room_id, employee_id FROM public.room_employee WHERE id = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             try (ResultSet rs = pstmt.executeQuery()) {
@@ -88,7 +88,7 @@ public class RoomEmployeeDAO implements BaseDAO<RoomEmployee> {
     public List<Employee> getEmployeesByRoomId(int roomId) throws SQLException {
         List<Employee> employees = new ArrayList<>();
         String sql = """
-            SELECT e.* FROM public.employee e
+            SELECT e.id, e.full_name, e.phone_number, e.experience, e.schedule FROM public.employee e
             JOIN public.room_employee re ON e.id = re.employee_id
             WHERE re.room_id = ?
             ORDER BY e.id
@@ -113,7 +113,7 @@ public class RoomEmployeeDAO implements BaseDAO<RoomEmployee> {
     public List<Room> getRoomsByEmployeeId(int employeeId) throws SQLException {
         List<Room> rooms = new ArrayList<>();
         String sql = """
-            SELECT r.* FROM public.room r
+            SELECT r.id, r.floor, r.status, r.type, r.price FROM public.room r
             JOIN public.room_employee re ON r.id = re.room_id
             WHERE re.employee_id = ?
             ORDER BY r.id

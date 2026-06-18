@@ -44,7 +44,7 @@ public class ServicePaymentDAO implements BaseDAO<ServicePayment> {
     @Override
     public List<ServicePayment> findAll() throws SQLException {
         List<ServicePayment> relations = new ArrayList<>();
-        String sql = "SELECT * FROM public.service_payment ORDER BY id";
+        String sql = "SELECT id, service_id, payment_id FROM public.service_payment ORDER BY id";
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
@@ -60,7 +60,7 @@ public class ServicePaymentDAO implements BaseDAO<ServicePayment> {
 
     @Override
     public ServicePayment findById(int id) throws SQLException {
-        String sql = "SELECT * FROM public.service_payment WHERE id = ?";
+        String sql = "SELECT id, service_id, payment_id FROM public.service_payment WHERE id = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             try (ResultSet rs = pstmt.executeQuery()) {
@@ -88,7 +88,7 @@ public class ServicePaymentDAO implements BaseDAO<ServicePayment> {
     public List<Payment> getPaymentsByServiceId(int serviceId) throws SQLException {
         List<Payment> payments = new ArrayList<>();
         String sql = """
-            SELECT p.* FROM public.payment p
+            SELECT p.id, p.status, p.amount, p.date, p.method, p.guest_id FROM public.payment p
             JOIN public.service_payment sp ON p.id = sp.payment_id
             WHERE sp.service_id = ?
             ORDER BY p.id
@@ -114,7 +114,7 @@ public class ServicePaymentDAO implements BaseDAO<ServicePayment> {
     public List<Service> getServicesByPaymentId(int paymentId) throws SQLException {
         List<Service> services = new ArrayList<>();
         String sql = """
-            SELECT s.* FROM public.service s
+            SELECT s.id, s.title, s.description, s.price, s.duration FROM public.service s
             JOIN public.service_payment sp ON s.id = sp.service_id
             WHERE sp.payment_id = ?
             ORDER BY s.id

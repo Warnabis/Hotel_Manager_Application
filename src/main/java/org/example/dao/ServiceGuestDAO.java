@@ -44,7 +44,7 @@ public class ServiceGuestDAO implements BaseDAO<ServiceGuest> {
     @Override
     public List<ServiceGuest> findAll() throws SQLException {
         List<ServiceGuest> relations = new ArrayList<>();
-        String sql = "SELECT * FROM public.service_guest ORDER BY id";
+        String sql = "SELECT id, service_id, guest_id FROM public.service_guest ORDER BY id";
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
@@ -60,7 +60,7 @@ public class ServiceGuestDAO implements BaseDAO<ServiceGuest> {
 
     @Override
     public ServiceGuest findById(int id) throws SQLException {
-        String sql = "SELECT * FROM public.service_guest WHERE id = ?";
+        String sql = "SELECT id, service_id, guest_id FROM public.service_guest WHERE id = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             try (ResultSet rs = pstmt.executeQuery()) {
@@ -88,7 +88,7 @@ public class ServiceGuestDAO implements BaseDAO<ServiceGuest> {
     public List<Guest> getGuestsByServiceId(int serviceId) throws SQLException {
         List<Guest> guests = new ArrayList<>();
         String sql = """
-            SELECT g.* FROM public.guest g
+            SELECT g.id, g.full_name, g.phone_number, g.email, g.status FROM public.guest g
             JOIN public.service_guest sg ON g.id = sg.guest_id
             WHERE sg.service_id = ?
             ORDER BY g.id
@@ -113,7 +113,7 @@ public class ServiceGuestDAO implements BaseDAO<ServiceGuest> {
     public List<Service> getServicesByGuestId(int guestId) throws SQLException {
         List<Service> services = new ArrayList<>();
         String sql = """
-            SELECT s.* FROM public.service s
+            SELECT s.id, s.title, s.description, s.price, s.duration FROM public.service s
             JOIN public.service_guest sg ON s.id = sg.service_id
             WHERE sg.guest_id = ?
             ORDER BY s.id

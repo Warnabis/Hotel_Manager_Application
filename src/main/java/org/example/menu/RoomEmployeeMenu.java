@@ -1,5 +1,6 @@
 package org.example.menu;
 
+import lombok.extern.slf4j.Slf4j;
 import org.example.dao.RoomEmployeeDAO;
 import org.example.models.RoomEmployee;
 import org.example.models.Employee;
@@ -8,29 +9,42 @@ import org.example.utilities.InputHelper;
 import java.sql.SQLException;
 import java.util.List;
 
+@Slf4j
 public class RoomEmployeeMenu {
 
+    private static final String MSG_RELATION_EXISTS = "Такая связь уже существует!";
+    private static final String MSG_RELATION_CREATED = "Связь создана! ID: ";
+    private static final String MSG_NO_RELATIONS = "Связей не найдено";
+    private static final String MSG_TOTAL = "Всего: ";
+    private static final String MSG_NOT_FOUND = "Связь не найдена!";
+    private static final String MSG_UPDATED = "Связь обновлена!";
+    private static final String MSG_NO_CHANGES = "Изменений не было.";
+    private static final String MSG_DELETED = "Связь удалена!";
+    private static final String MSG_DELETE_CANCELLED = "Удаление отменено.";
+    private static final String MSG_ROOMS_DELETED = "Все связи номера удалены!";
+    private static final String MSG_EMPLOYEES_DELETED = "Все связи сотрудника удалены!";
+
     public static void create(RoomEmployeeDAO dao) throws SQLException {
-        System.out.println("\n--- Добавление связи номер-сотрудник ---");
+        log.info("\n--- Добавление связи номер-сотрудник ---");
         int roomId = InputHelper.readInt("ID номера: ");
         int employeeId = InputHelper.readInt("ID сотрудника: ");
         if (!dao.exists(roomId, employeeId)) {
             RoomEmployee relation = new RoomEmployee(roomId, employeeId);
             dao.create(relation);
-            System.out.println("Связь создана! ID: " + relation.getId());
+            log.info(MSG_RELATION_CREATED + relation.getId());
         } else {
-            System.out.println("Такая связь уже существует!");
+            log.warn(MSG_RELATION_EXISTS);
         }
     }
 
     public static void findAll(RoomEmployeeDAO dao) throws SQLException {
-        System.out.println("\n--- Все связи номер-сотрудник ---");
+        log.info("\n--- Все связи номер-сотрудник ---");
         List<RoomEmployee> relations = dao.findAll();
         if (relations.isEmpty()) {
-            System.out.println("Связей не найдено");
+            log.info(MSG_NO_RELATIONS);
         } else {
-            relations.forEach(System.out::println);
-            System.out.println("Всего: " + relations.size());
+            relations.forEach(relation -> log.info(relation.toString()));
+            log.info(MSG_TOTAL + relations.size());
         }
     }
 
@@ -38,9 +52,9 @@ public class RoomEmployeeMenu {
         int id = InputHelper.readInt("Введите ID связи: ");
         RoomEmployee relation = dao.findById(id);
         if (relation != null) {
-            System.out.println(relation);
+            log.info(relation.toString());
         } else {
-            System.out.println("Связь не найдена!");
+            log.warn(MSG_NOT_FOUND);
         }
     }
 
@@ -48,21 +62,19 @@ public class RoomEmployeeMenu {
         int id = InputHelper.readInt("Введите ID связи для обновления: ");
         RoomEmployee relation = dao.findById(id);
         if (relation == null) {
-            System.out.println("Связь не найдена!");
+            log.warn(MSG_NOT_FOUND);
             return;
         }
-        System.out.println("Текущие данные: " + relation);
-
+        log.info("Текущие данные: {}", relation);
         int newRoomId = InputHelper.readOptionalInt("Новый ID номера [" + relation.getRoomId() + "]: ", relation.getRoomId());
         int newEmployeeId = InputHelper.readOptionalInt("Новый ID сотрудника [" + relation.getEmployeeId() + "]: ", relation.getEmployeeId());
-
         if (newRoomId != relation.getRoomId() || newEmployeeId != relation.getEmployeeId()) {
             relation.setRoomId(newRoomId);
             relation.setEmployeeId(newEmployeeId);
             dao.update(relation);
-            System.out.println("Связь обновлена!");
+            log.info(MSG_UPDATED);
         } else {
-            System.out.println("Изменений не было.");
+            log.info(MSG_NO_CHANGES);
         }
     }
 
@@ -70,38 +82,38 @@ public class RoomEmployeeMenu {
         int id = InputHelper.readInt("Введите ID связи для удаления: ");
         RoomEmployee relation = dao.findById(id);
         if (relation == null) {
-            System.out.println("Связь не найдена!");
+            log.warn(MSG_NOT_FOUND);
             return;
         }
         if (InputHelper.confirmAction("Удалить связь " + relation)) {
             dao.delete(id);
-            System.out.println("Связь удалена!");
+            log.info(MSG_DELETED);
         } else {
-            System.out.println("Удаление отменено.");
+            log.info(MSG_DELETE_CANCELLED);
         }
     }
 
     public static void showEmployeesByRoom(RoomEmployeeDAO dao) throws SQLException {
         int roomId = InputHelper.readInt("Введите ID номера: ");
-        System.out.println("\n--- Сотрудники номера ---");
+        log.info("\n--- Сотрудники номера ---");
         List<Employee> employees = dao.getEmployeesByRoomId(roomId);
         if (employees.isEmpty()) {
-            System.out.println("Сотрудники не найдены");
+            log.info("Сотрудники не найдены");
         } else {
-            employees.forEach(System.out::println);
-            System.out.println("Всего: " + employees.size());
+            employees.forEach(employee -> log.info(employee.toString()));
+            log.info(MSG_TOTAL + employees.size());
         }
     }
 
     public static void showRoomsByEmployee(RoomEmployeeDAO dao) throws SQLException {
         int employeeId = InputHelper.readInt("Введите ID сотрудника: ");
-        System.out.println("\n--- Номера сотрудника ---");
+        log.info("\n--- Номера сотрудника ---");
         List<Room> rooms = dao.getRoomsByEmployeeId(employeeId);
         if (rooms.isEmpty()) {
-            System.out.println("Номера не найдены");
+            log.info("Номера не найдены");
         } else {
-            rooms.forEach(System.out::println);
-            System.out.println("Всего: " + rooms.size());
+            rooms.forEach(room -> log.info(room.toString()));
+            log.info(MSG_TOTAL + rooms.size());
         }
     }
 
@@ -109,9 +121,9 @@ public class RoomEmployeeMenu {
         int roomId = InputHelper.readInt("Введите ID номера: ");
         if (InputHelper.confirmAction("Удалить все связи номера")) {
             dao.deleteByRoomId(roomId);
-            System.out.println("Все связи номера удалены!");
+            log.info(MSG_ROOMS_DELETED);
         } else {
-            System.out.println("Удаление отменено.");
+            log.info(MSG_DELETE_CANCELLED);
         }
     }
 
@@ -119,9 +131,9 @@ public class RoomEmployeeMenu {
         int employeeId = InputHelper.readInt("Введите ID сотрудника: ");
         if (InputHelper.confirmAction("Удалить все связи сотрудника")) {
             dao.deleteByEmployeeId(employeeId);
-            System.out.println("Все связи сотрудника удалены!");
+            log.info(MSG_EMPLOYEES_DELETED);
         } else {
-            System.out.println("Удаление отменено.");
+            log.info(MSG_DELETE_CANCELLED);
         }
     }
 }

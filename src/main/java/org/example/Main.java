@@ -1,5 +1,6 @@
 package org.example;
 
+import lombok.extern.slf4j.Slf4j;
 import org.example.dao.*;
 import org.example.menu.*;
 import org.example.db.DatabaseConnection;
@@ -10,7 +11,27 @@ import java.sql.SQLException;
 import java.util.Scanner;
 import static org.example.utilities.CrudUtils.*;
 
+@Slf4j
 public class Main {
+
+    private static final String ENTITY_GUEST = "Гость";
+    private static final String ENTITY_ROOM = "Номер";
+    private static final String ENTITY_BOOKING = "Бронирование";
+    private static final String ENTITY_EMPLOYEE = "Сотрудник";
+    private static final String ENTITY_SERVICE = "Услуга";
+    private static final String ENTITY_POSITION = "Должность";
+    private static final String ENTITY_PAYMENT = "Платеж";
+
+    private static final String RELATION_EMPLOYEE_POSITION = "Сотрудник ↔ Должность";
+    private static final String RELATION_ROOM_BOOKING = "Номер ↔ Бронирование";
+    private static final String RELATION_BOOKING_PAYMENT = "Бронирование ↔ Платеж";
+    private static final String RELATION_ROOM_EMPLOYEE = "Номер ↔ Сотрудник";
+    private static final String RELATION_SERVICE_EMPLOYEE = "Услуга ↔ Сотрудник";
+    private static final String RELATION_SERVICE_GUEST = "Услуга ↔ Гость";
+    private static final String RELATION_SERVICE_PAYMENT = "Услуга ↔ Платеж";
+
+    private static final String MSG_INVALID_CHOICE = "Неверный выбор!";
+
     private static GuestDAO guestDAO;
     private static RoomDAO roomDAO;
     private static BookingDAO bookingDAO;
@@ -48,7 +69,7 @@ public class Main {
             serviceGuestDAO = new ServiceGuestDAO(connection);
             servicePaymentDAO = new ServicePaymentDAO(connection);
 
-            System.out.println("Подключение к БД успешно!");
+            log.info("Подключение к БД успешно!");
 
             while (true) {
                 printMainMenu();
@@ -72,159 +93,156 @@ public class Main {
                     case 0 -> {
                         System.exit(0);
                     }
-                    default -> System.out.println("Неверный выбор!");
+                    default -> log.warn(MSG_INVALID_CHOICE);
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Ошибка: " + e.getMessage());
-            e.printStackTrace();
+            log.error("Ошибка подключения к БД: {}", e.getMessage(), e);
         }
     }
 
     private static void printMainMenu() {
-        System.out.println("\n========== ГЛАВНОЕ МЕНЮ ==========");
-        System.out.println("--- Основные таблицы ---");
-        System.out.println("1. Гости");
-        System.out.println("2. Номера");
-        System.out.println("3. Бронирования");
-        System.out.println("4. Сотрудники");
-        System.out.println("5. Услуги");
-        System.out.println("6. Должности");
-        System.out.println("7. Платежи");
-        System.out.println("8. Сотрудник ↔ Должность");
-        System.out.println("9. Номер ↔ Бронирование");
-        System.out.println("10. Бронирование ↔ Платеж");
-        System.out.println("11. Номер ↔ Сотрудник");
-        System.out.println("12. Услуга ↔ Сотрудник");
-        System.out.println("13. Услуга ↔ Гость");
-        System.out.println("14. Услуга ↔ Платеж");
-        System.out.println("0. Выход");
-        System.out.print("Ваш выбор: ");
+        log.info("\n========== ГЛАВНОЕ МЕНЮ ==========");
+        log.info("1. {}", ENTITY_GUEST );
+        log.info("2. {}", ENTITY_ROOM);
+        log.info("3. {}", ENTITY_BOOKING);
+        log.info("4. {}", ENTITY_EMPLOYEE);
+        log.info("5. {}", ENTITY_SERVICE );
+        log.info("6. {}", ENTITY_POSITION);
+        log.info("7. {}", ENTITY_PAYMENT);
+        log.info("8. {}", RELATION_EMPLOYEE_POSITION);
+        log.info("9. {}", RELATION_ROOM_BOOKING);
+        log.info("10. {}", RELATION_BOOKING_PAYMENT);
+        log.info("11. {}", RELATION_ROOM_EMPLOYEE);
+        log.info("12. {}", RELATION_SERVICE_EMPLOYEE);
+        log.info("13. {}", RELATION_SERVICE_GUEST);
+        log.info("14. {}", RELATION_SERVICE_PAYMENT);
+        log.info("0. Выход");
     }
 
     private static void guestMenu() throws SQLException {
         while (true) {
-            printEntityMenu("Гость");
-            int choice = InputHelper.readMenuChoice("");
+            printEntityMenu(ENTITY_GUEST);
+            int choice = InputHelper.readMenuChoice("Ваш выбор: ");
 
             switch (choice) {
-                case 1 -> createEntity(guestDAO, "Гость", GuestMenu::createGuest);
-                case 2 -> findAllEntities(guestDAO, "Гость");
-                case 3 -> findEntityById(guestDAO, "Гость");
-                case 4 -> updateEntity(guestDAO, "Гость", GuestMenu::updateGuest);
-                case 5 -> deleteEntity(guestDAO, "Гость");
+                case 1 -> createEntity(guestDAO, ENTITY_GUEST, GuestMenu::createGuest);
+                case 2 -> findAllEntities(guestDAO, ENTITY_GUEST);
+                case 3 -> findEntityById(guestDAO, ENTITY_GUEST);
+                case 4 -> updateEntity(guestDAO, ENTITY_GUEST, GuestMenu::updateGuest);
+                case 5 -> deleteEntity(guestDAO, ENTITY_GUEST);
                 case 0 -> { return; }
-                default -> System.out.println("Неверный выбор!");
+                default -> log.warn(MSG_INVALID_CHOICE);
             }
         }
     }
 
     private static void roomMenu() throws SQLException {
         while (true) {
-            printEntityMenu("Номер");
-            int choice = InputHelper.readMenuChoice("");
+            printEntityMenu(ENTITY_ROOM);
+            int choice = InputHelper.readMenuChoice("Ваш выбор: ");
 
             switch (choice) {
-                case 1 -> createEntity(roomDAO, "Номер", RoomMenu::createRoom);
-                case 2 -> findAllEntities(roomDAO, "Номер");
-                case 3 -> findEntityById(roomDAO, "Номер");
-                case 4 -> updateEntity(roomDAO, "Номер", RoomMenu::updateRoom);
-                case 5 -> deleteEntity(roomDAO, "Номер");
+                case 1 -> createEntity(roomDAO, ENTITY_ROOM, RoomMenu::createRoom);
+                case 2 -> findAllEntities(roomDAO, ENTITY_ROOM);
+                case 3 -> findEntityById(roomDAO, ENTITY_ROOM);
+                case 4 -> updateEntity(roomDAO, ENTITY_ROOM, RoomMenu::updateRoom);
+                case 5 -> deleteEntity(roomDAO, ENTITY_ROOM);
                 case 0 -> { return; }
-                default -> System.out.println("Неверный выбор!");
+                default -> log.warn(MSG_INVALID_CHOICE);
             }
         }
     }
 
     private static void bookingMenu() throws SQLException {
         while (true) {
-            printEntityMenu("Бронирование");
-            int choice = InputHelper.readMenuChoice("");
+            printEntityMenu(ENTITY_BOOKING);
+            int choice = InputHelper.readMenuChoice("Ваш выбор: ");
 
             switch (choice) {
-                case 1 -> createEntity(bookingDAO, "Бронирование", BookingMenu::createBooking);
-                case 2 -> findAllEntities(bookingDAO, "Бронирование");
-                case 3 -> findEntityById(bookingDAO, "Бронирование");
-                case 4 -> updateEntity(bookingDAO, "Бронирование", BookingMenu::updateBooking);
-                case 5 -> deleteEntity(bookingDAO, "Бронирование");
+                case 1 -> createEntity(bookingDAO, ENTITY_BOOKING, BookingMenu::createBooking);
+                case 2 -> findAllEntities(bookingDAO, ENTITY_BOOKING);
+                case 3 -> findEntityById(bookingDAO, ENTITY_BOOKING);
+                case 4 -> updateEntity(bookingDAO, ENTITY_BOOKING, BookingMenu::updateBooking);
+                case 5 -> deleteEntity(bookingDAO, ENTITY_BOOKING);
                 case 0 -> { return; }
-                default -> System.out.println("Неверный выбор!");
+                default -> log.warn(MSG_INVALID_CHOICE);
             }
         }
     }
 
     private static void employeeMenu() throws SQLException {
         while (true) {
-            printEntityMenu("Сотрудник");
-            int choice = InputHelper.readMenuChoice("");
+            printEntityMenu(ENTITY_EMPLOYEE);
+            int choice = InputHelper.readMenuChoice("Ваш выбор: ");
 
             switch (choice) {
-                case 1 -> createEntity(employeeDAO, "Сотрудник", EmployeeMenu::createEmployee);
-                case 2 -> findAllEntities(employeeDAO, "Сотрудник");
-                case 3 -> findEntityById(employeeDAO, "Сотрудник");
-                case 4 -> updateEntity(employeeDAO, "Сотрудник", EmployeeMenu::updateEmployee);
-                case 5 -> deleteEntity(employeeDAO, "Сотрудник");
+                case 1 -> createEntity(employeeDAO, ENTITY_EMPLOYEE, EmployeeMenu::createEmployee);
+                case 2 -> findAllEntities(employeeDAO, ENTITY_EMPLOYEE);
+                case 3 -> findEntityById(employeeDAO, ENTITY_EMPLOYEE);
+                case 4 -> updateEntity(employeeDAO, ENTITY_EMPLOYEE, EmployeeMenu::updateEmployee);
+                case 5 -> deleteEntity(employeeDAO, ENTITY_EMPLOYEE);
                 case 0 -> { return; }
-                default -> System.out.println("Неверный выбор!");
+                default -> log.warn(MSG_INVALID_CHOICE);
             }
         }
     }
 
     private static void serviceMenu() throws SQLException {
         while (true) {
-            printEntityMenu("Услуга");
-            int choice = InputHelper.readMenuChoice("");
+            printEntityMenu(ENTITY_SERVICE);
+            int choice = InputHelper.readMenuChoice("Ваш выбор: ");
 
             switch (choice) {
-                case 1 -> createEntity(serviceDAO, "Услуга", ServiceMenu::createService);
-                case 2 -> findAllEntities(serviceDAO, "Услуга");
-                case 3 -> findEntityById(serviceDAO, "Услуга");
-                case 4 -> updateEntity(serviceDAO, "Услуга", ServiceMenu::updateService);
-                case 5 -> deleteEntity(serviceDAO, "Услуга");
+                case 1 -> createEntity(serviceDAO, ENTITY_SERVICE, ServiceMenu::createService);
+                case 2 -> findAllEntities(serviceDAO, ENTITY_SERVICE);
+                case 3 -> findEntityById(serviceDAO, ENTITY_SERVICE);
+                case 4 -> updateEntity(serviceDAO, ENTITY_SERVICE, ServiceMenu::updateService);
+                case 5 -> deleteEntity(serviceDAO, ENTITY_SERVICE);
                 case 0 -> { return; }
-                default -> System.out.println("Неверный выбор!");
+                default -> log.warn(MSG_INVALID_CHOICE);
             }
         }
     }
 
     private static void positionMenu() throws SQLException {
         while (true) {
-            printEntityMenu("Должность");
-            int choice = InputHelper.readMenuChoice("");
+            printEntityMenu(ENTITY_POSITION);
+            int choice = InputHelper.readMenuChoice("Ваш выбор: ");
 
             switch (choice) {
-                case 1 -> createEntity(positionDAO, "Должность", PositionMenu::createPosition);
-                case 2 -> findAllEntities(positionDAO, "Должность");
-                case 3 -> findEntityById(positionDAO, "Должность");
-                case 4 -> updateEntity(positionDAO, "Должность", PositionMenu::updatePosition);
-                case 5 -> deleteEntity(positionDAO, "Должность");
+                case 1 -> createEntity(positionDAO, ENTITY_POSITION, PositionMenu::createPosition);
+                case 2 -> findAllEntities(positionDAO, ENTITY_POSITION);
+                case 3 -> findEntityById(positionDAO, ENTITY_POSITION);
+                case 4 -> updateEntity(positionDAO, ENTITY_POSITION, PositionMenu::updatePosition);
+                case 5 -> deleteEntity(positionDAO, ENTITY_POSITION);
                 case 0 -> { return; }
-                default -> System.out.println("Неверный выбор!");
+                default -> log.warn(MSG_INVALID_CHOICE);
             }
         }
     }
 
     private static void paymentMenu() throws SQLException {
         while (true) {
-            printEntityMenu("Платеж");
-            int choice = InputHelper.readMenuChoice("");
+            printEntityMenu(ENTITY_PAYMENT);
+            int choice = InputHelper.readMenuChoice("Ваш выбор: ");
 
             switch (choice) {
-                case 1 -> createEntity(paymentDAO, "Платеж", PaymentMenu::createPayment);
-                case 2 -> findAllEntities(paymentDAO, "Платеж");
-                case 3 -> findEntityById(paymentDAO, "Платеж");
-                case 4 -> updateEntity(paymentDAO, "Платеж", PaymentMenu::updatePayment);
-                case 5 -> deleteEntity(paymentDAO, "Платеж");
+                case 1 -> createEntity(paymentDAO, ENTITY_PAYMENT, PaymentMenu::createPayment);
+                case 2 -> findAllEntities(paymentDAO, ENTITY_PAYMENT);
+                case 3 -> findEntityById(paymentDAO, ENTITY_PAYMENT);
+                case 4 -> updateEntity(paymentDAO, ENTITY_PAYMENT, PaymentMenu::updatePayment);
+                case 5 -> deleteEntity(paymentDAO, ENTITY_PAYMENT);
                 case 0 -> { return; }
-                default -> System.out.println("Неверный выбор!");
+                default -> log.warn(MSG_INVALID_CHOICE);
             }
         }
     }
 
     private static void employeePositionMenu() throws SQLException {
         while (true) {
-            printRelationMenu("Сотрудник ↔ Должность");
-            int choice = InputHelper.readMenuChoice("");
+            printRelationMenu(RELATION_EMPLOYEE_POSITION);
+            int choice = InputHelper.readMenuChoice("Ваш выбор: ");
             switch (choice) {
                 case 1 -> EmployeePositionMenu.create(employeePositionDAO);
                 case 2 -> EmployeePositionMenu.findAll(employeePositionDAO);
@@ -236,15 +254,15 @@ public class Main {
                 case 8 -> EmployeePositionMenu.deleteByEmployeeId(employeePositionDAO);
                 case 9 -> EmployeePositionMenu.deleteByPositionId(employeePositionDAO);
                 case 0 -> { return; }
-                default -> System.out.println("Неверный выбор!");
+                default -> log.warn(MSG_INVALID_CHOICE);
             }
         }
     }
 
     private static void roomBookingMenu() throws SQLException {
         while (true) {
-            printRelationMenu("Номер ↔ Бронирование");
-            int choice = InputHelper.readMenuChoice("");
+            printRelationMenu(RELATION_ROOM_BOOKING);
+            int choice = InputHelper.readMenuChoice("Ваш выбор: ");
             switch (choice) {
                 case 1 -> RoomBookingMenu.create(roomBookingDAO);
                 case 2 -> RoomBookingMenu.findAll(roomBookingDAO);
@@ -256,15 +274,15 @@ public class Main {
                 case 8 -> RoomBookingMenu.deleteByRoomId(roomBookingDAO);
                 case 9 -> RoomBookingMenu.deleteByBookingId(roomBookingDAO);
                 case 0 -> { return; }
-                default -> System.out.println("Неверный выбор!");
+                default -> log.warn(MSG_INVALID_CHOICE);
             }
         }
     }
 
     private static void bookingPaymentMenu() throws SQLException {
         while (true) {
-            printRelationMenu("Бронирование ↔ Платеж");
-            int choice = InputHelper.readMenuChoice("");
+            printRelationMenu(RELATION_BOOKING_PAYMENT);
+            int choice = InputHelper.readMenuChoice("Ваш выбор: ");
             switch (choice) {
                 case 1 -> BookingPaymentMenu.create(bookingPaymentDAO);
                 case 2 -> BookingPaymentMenu.findAll(bookingPaymentDAO);
@@ -276,15 +294,15 @@ public class Main {
                 case 8 -> BookingPaymentMenu.deleteByBookingId(bookingPaymentDAO);
                 case 9 -> BookingPaymentMenu.deleteByPaymentId(bookingPaymentDAO);
                 case 0 -> { return; }
-                default -> System.out.println("Неверный выбор!");
+                default -> log.warn(MSG_INVALID_CHOICE);
             }
         }
     }
 
     private static void roomEmployeeMenu() throws SQLException {
         while (true) {
-            printRelationMenu("Номер ↔ Сотрудник");
-            int choice = InputHelper.readMenuChoice("");
+            printRelationMenu(RELATION_ROOM_EMPLOYEE);
+            int choice = InputHelper.readMenuChoice("Ваш выбор: ");
             switch (choice) {
                 case 1 -> RoomEmployeeMenu.create(roomEmployeeDAO);
                 case 2 -> RoomEmployeeMenu.findAll(roomEmployeeDAO);
@@ -296,15 +314,15 @@ public class Main {
                 case 8 -> RoomEmployeeMenu.deleteByRoomId(roomEmployeeDAO);
                 case 9 -> RoomEmployeeMenu.deleteByEmployeeId(roomEmployeeDAO);
                 case 0 -> { return; }
-                default -> System.out.println("Неверный выбор!");
+                default -> log.warn(MSG_INVALID_CHOICE);
             }
         }
     }
 
     private static void serviceEmployeeMenu() throws SQLException {
         while (true) {
-            printRelationMenu("Услуга ↔ Сотрудник");
-            int choice = InputHelper.readMenuChoice("");
+            printRelationMenu(RELATION_SERVICE_EMPLOYEE);
+            int choice = InputHelper.readMenuChoice("Ваш выбор: ");
             switch (choice) {
                 case 1 -> ServiceEmployeeMenu.create(serviceEmployeeDAO);
                 case 2 -> ServiceEmployeeMenu.findAll(serviceEmployeeDAO);
@@ -316,15 +334,15 @@ public class Main {
                 case 8 -> ServiceEmployeeMenu.deleteByServiceId(serviceEmployeeDAO);
                 case 9 -> ServiceEmployeeMenu.deleteByEmployeeId(serviceEmployeeDAO);
                 case 0 -> { return; }
-                default -> System.out.println("Неверный выбор!");
+                default -> log.warn(MSG_INVALID_CHOICE);
             }
         }
     }
 
     private static void serviceGuestMenu() throws SQLException {
         while (true) {
-            printRelationMenu("Услуга ↔ Гость");
-            int choice = InputHelper.readMenuChoice("");
+            printRelationMenu(RELATION_SERVICE_GUEST);
+            int choice = InputHelper.readMenuChoice("Ваш выбор: ");
             switch (choice) {
                 case 1 -> ServiceGuestMenu.create(serviceGuestDAO);
                 case 2 -> ServiceGuestMenu.findAll(serviceGuestDAO);
@@ -336,15 +354,15 @@ public class Main {
                 case 8 -> ServiceGuestMenu.deleteByServiceId(serviceGuestDAO);
                 case 9 -> ServiceGuestMenu.deleteByGuestId(serviceGuestDAO);
                 case 0 -> { return; }
-                default -> System.out.println("Неверный выбор!");
+                default -> log.warn(MSG_INVALID_CHOICE);
             }
         }
     }
 
     private static void servicePaymentMenu() throws SQLException {
         while (true) {
-            printRelationMenu("Услуга ↔ Платеж");
-            int choice = InputHelper.readMenuChoice("");
+            printRelationMenu(RELATION_SERVICE_PAYMENT);
+            int choice = InputHelper.readMenuChoice("Ваш выбор: ");
             switch (choice) {
                 case 1 -> ServicePaymentMenu.create(servicePaymentDAO);
                 case 2 -> ServicePaymentMenu.findAll(servicePaymentDAO);
@@ -356,36 +374,32 @@ public class Main {
                 case 8 -> ServicePaymentMenu.deleteByServiceId(servicePaymentDAO);
                 case 9 -> ServicePaymentMenu.deleteByPaymentId(servicePaymentDAO);
                 case 0 -> { return; }
-                default -> System.out.println("Неверный выбор!");
+                default -> log.warn(MSG_INVALID_CHOICE);
             }
         }
     }
 
-
     private static void printEntityMenu(String entityName) {
-        System.out.println("\n========== " + entityName.toUpperCase() + " ==========");
-        System.out.println("1. Добавить");
-        System.out.println("2. Показать все");
-        System.out.println("3. Найти по ID");
-        System.out.println("4. Обновить");
-        System.out.println("5. Удалить");
-        System.out.println("0. Назад");
-        System.out.print("Ваш выбор: ");
+        log.info("\n========== {} ==========", entityName.toUpperCase());
+        log.info("1. Добавить");
+        log.info("2. Показать все");
+        log.info("3. Найти по ID");
+        log.info("4. Обновить");
+        log.info("5. Удалить");
+        log.info("0. Назад");
     }
 
     private static void printRelationMenu(String relationName) {
-        System.out.println("\n========== " + relationName + " ==========");
-        System.out.println("1. Добавить связь");
-        System.out.println("2. Показать все связи");
-        System.out.println("3. Найти связь по ID");
-        System.out.println("4. Обновить связь");
-        System.out.println("5. Удалить связь");
-        System.out.println("6. Показать по правой связи");
-        System.out.println("7. Показать по левой связи");
-        System.out.println("8. Удалить по правой связи");
-        System.out.println("9. Удалить по левой связи");
-        System.out.println("0. Назад");
-        System.out.print("Ваш выбор: ");
+        log.info("\n========== {} ==========", relationName);
+        log.info("1. Добавить связь");
+        log.info("2. Показать все связи");
+        log.info("3. Найти связь по ID");
+        log.info("4. Обновить связь");
+        log.info("5. Удалить связь");
+        log.info("6. Показать по правой связи");
+        log.info("7. Показать по левой связи");
+        log.info("8. Удалить по правой связи");
+        log.info("9. Удалить по левой связи");
+        log.info("0. Назад");
     }
-
 }

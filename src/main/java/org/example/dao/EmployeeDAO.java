@@ -35,7 +35,7 @@ public class EmployeeDAO implements BaseDAO<Employee> {
     @Override
     public List<Employee> findAll() throws SQLException {
         List<Employee> employees = new ArrayList<>();
-        String sql = "SELECT * FROM public.employee ORDER BY id";
+        String sql = "SELECT id, full_name, phone_number, experience, schedule FROM public.employee ORDER BY id";
 
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
@@ -55,7 +55,7 @@ public class EmployeeDAO implements BaseDAO<Employee> {
 
     @Override
     public Employee findById(int id) throws SQLException {
-        String sql = "SELECT * FROM public.employee WHERE id = ?";
+        String sql = "SELECT id, full_name, phone_number, experience, schedule FROM public.employee WHERE id = ?";
 
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, id);
@@ -97,6 +97,4 @@ public class EmployeeDAO implements BaseDAO<Employee> {
             pstmt.executeUpdate();
         }
     }
-
-
 }

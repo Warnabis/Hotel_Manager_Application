@@ -1,12 +1,14 @@
 package org.example.menu;
 
+import lombok.extern.slf4j.Slf4j;
 import org.example.models.Employee;
 import org.example.utilities.InputHelper;
 
+@Slf4j
 public class EmployeeMenu {
 
     public static Employee createEmployee() {
-        System.out.println("\n--- Добавление нового сотрудника ---");
+        log.info("\n--- Добавление нового сотрудника ---");
         String fullName = InputHelper.readNonEmptyString("ФИО: ");
         String phoneNumber = InputHelper.readNonEmptyString("Телефон: ");
         String experience = InputHelper.readNonEmptyString("Опыт работы: ");
@@ -16,8 +18,8 @@ public class EmployeeMenu {
 
     public static boolean updateEmployee(Employee employee) {
         boolean updated = false;
-        System.out.println("Текущие данные: " + employee);
-        System.out.println("(оставьте поле пустым, чтобы не менять)");
+        log.info("Текущие данные: {}", employee);
+        log.info("(оставьте поле пустым, чтобы не менять)");
 
         String fullName = InputHelper.readOptionalString("Новое ФИО [" + employee.getFullName() + "]: ");
         if (!fullName.isEmpty()) {

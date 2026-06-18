@@ -35,7 +35,7 @@ public class ServiceDAO implements BaseDAO<Service> {
     @Override
     public List<Service> findAll() throws SQLException {
         List<Service> services = new ArrayList<>();
-        String sql = "SELECT * FROM public.service ORDER BY id";
+        String sql = "SELECT id, title, description, price, duration FROM public.service ORDER BY id";
 
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
@@ -55,7 +55,7 @@ public class ServiceDAO implements BaseDAO<Service> {
 
     @Override
     public Service findById(int id) throws SQLException {
-        String sql = "SELECT * FROM public.service WHERE id = ?";
+        String sql = "SELECT id, title, description, price, duration FROM public.service WHERE id = ?";
 
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, id);

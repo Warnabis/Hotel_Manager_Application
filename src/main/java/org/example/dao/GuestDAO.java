@@ -41,7 +41,7 @@ public class GuestDAO implements BaseDAO<Guest> {
     @Override
     public List<Guest> findAll() {
         List<Guest> guests = new ArrayList<>();
-        String sql = "SELECT * FROM public.guest ORDER BY id";
+        String sql = "SELECT id, full_name, phone_number, email, status FROM public.guest ORDER BY id";
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
@@ -61,7 +61,7 @@ public class GuestDAO implements BaseDAO<Guest> {
 
     @Override
     public Guest findById(int id) {
-        String sql = "SELECT * FROM public.guest WHERE id = ?";
+        String sql = "SELECT id, full_name, phone_number, email, status FROM public.guest WHERE id = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             try (ResultSet rs = pstmt.executeQuery()) {

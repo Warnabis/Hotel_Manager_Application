@@ -26,7 +26,6 @@ public class BookingPaymentDAO implements BaseDAO<BookingPayment> {
                 if (rs.next()) {
                     relation.setId(rs.getInt(1));
                 } else {
-                    // Если не удалось получить ID через GENERATED_KEYS, используем MAX
                     String maxSql = "SELECT COALESCE(MAX(id), 0) + 1 FROM public.booking_payment";
                     try (Statement stmt = connection.createStatement();
                          ResultSet maxRs = stmt.executeQuery(maxSql)) {
@@ -53,7 +52,7 @@ public class BookingPaymentDAO implements BaseDAO<BookingPayment> {
     @Override
     public List<BookingPayment> findAll() throws SQLException {
         List<BookingPayment> relations = new ArrayList<>();
-        String sql = "SELECT * FROM public.booking_payment ORDER BY id";
+        String sql = "SELECT id, booking_id, payment_id FROM public.booking_payment ORDER BY id";
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
@@ -69,7 +68,7 @@ public class BookingPaymentDAO implements BaseDAO<BookingPayment> {
 
     @Override
     public BookingPayment findById(int id) throws SQLException {
-        String sql = "SELECT * FROM public.booking_payment WHERE id = ?";
+        String sql = "SELECT id, booking_id, payment_id FROM public.booking_payment WHERE id = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             try (ResultSet rs = pstmt.executeQuery()) {
@@ -97,7 +96,7 @@ public class BookingPaymentDAO implements BaseDAO<BookingPayment> {
     public List<Payment> getPaymentsByBookingId(int bookingId) throws SQLException {
         List<Payment> payments = new ArrayList<>();
         String sql = """
-            SELECT p.* FROM public.payment p
+            SELECT p.id, p.status, p.amount, p.date, p.method, p.guest_id FROM public.payment p
             JOIN public.booking_payment bp ON p.id = bp.payment_id
             WHERE bp.booking_id = ?
             ORDER BY p.id
@@ -123,7 +122,7 @@ public class BookingPaymentDAO implements BaseDAO<BookingPayment> {
     public List<Booking> getBookingsByPaymentId(int paymentId) throws SQLException {
         List<Booking> bookings = new ArrayList<>();
         String sql = """
-            SELECT b.* FROM public.booking b
+            SELECT b.id, b.price, b.status, b.check_in, b.duration, b.guest_id FROM public.booking b
             JOIN public.booking_payment bp ON b.id = bp.booking_id
             WHERE bp.payment_id = ?
             ORDER BY b.id

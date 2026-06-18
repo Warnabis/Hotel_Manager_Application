@@ -1,14 +1,16 @@
 package org.example.menu;
 
+import lombok.extern.slf4j.Slf4j;
 import org.example.models.Booking;
 import org.example.utilities.InputHelper;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+@Slf4j
 public class BookingMenu {
 
     public static Booking createBooking() {
-        System.out.println("\n--- Добавление нового бронирования ---");
+        log.info("\n--- Добавление нового бронирования ---");
 
         BigDecimal price = InputHelper.readBigDecimal("Цена: ");
         String status = InputHelper.readNonEmptyString("Статус (подтверждено/заселен/отменено/на обработке): ");
@@ -22,8 +24,8 @@ public class BookingMenu {
     public static boolean updateBooking(Booking booking) {
         boolean updated = false;
 
-        System.out.println("Текущие данные: " + booking);
-        System.out.println("(оставьте поле пустым, чтобы не менять)");
+        log.info("Текущие данные: {}", booking);
+        log.info("(оставьте поле пустым, чтобы не менять)");
 
         BigDecimal newPrice = InputHelper.readOptionalBigDecimal(
           "Новая цена [" + booking.getPrice() + "]: ",

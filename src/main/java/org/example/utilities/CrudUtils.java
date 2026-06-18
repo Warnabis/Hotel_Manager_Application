@@ -1,109 +1,88 @@
 package org.example.utilities;
 
+import lombok.extern.slf4j.Slf4j;
 import org.example.dao.BaseDAO;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Scanner;
 
+@Slf4j
 public class CrudUtils {
+
+    private static final String MSG_NOT_FOUND = " не найдены.";
+    private static final String MSG_NOT_FOUND_SINGLE = " не найден.";
+    private static final String MSG_NO_CHANGES = "Изменений не было.";
+    private static final String MSG_UPDATED = "Данные обновлены!";
+    private static final String MSG_DELETED = " удален(а)!";
+    private static final String MSG_DELETE_CANCELLED = "Удаление отменено.";
+
     private static final Scanner scanner = new Scanner(System.in);
 
-    public static <T> void createEntity(
-      BaseDAO<T> dao,
-      String entityName,
-      Creator<T> creator) throws SQLException {
-
+    public static <T> void createEntity(BaseDAO<T> dao, String entityName, Creator<T> creator) throws SQLException {
         T entity = creator.create();
         dao.create(entity);
-        System.out.println(entityName + " успешно добавлен(а)! ID: " + getEntityId(entity));
+        log.info("{} успешно добавлен! ID: {}", entityName, getEntityId(entity));
     }
 
-    public static <T> void findAllEntities(
-      BaseDAO<T> dao,
-      String entityName) throws SQLException {
-
-        System.out.println("\n--- Список всех " + entityName + "ов ---");
+    public static <T> void findAllEntities(BaseDAO<T> dao, String entityName) throws SQLException {
+        log.info("\n--- Список всех {}ов ---", entityName);
         List<T> entities = dao.findAll();
-
         if (entities.isEmpty()) {
-            System.out.println(entityName + " не найдены.");
+            log.info("{}{}", entityName, MSG_NOT_FOUND);
         } else {
-            entities.forEach(System.out::println);
-            System.out.println("Всего: " + entities.size() + " " + entityName + "(ов)");
+            entities.forEach(entity -> log.info(entity.toString()));
+            log.info("Всего: {} {}", entities.size(), entityName);
         }
     }
 
-    public static <T> void findEntityById(
-      BaseDAO<T> dao,
-      String entityName) throws SQLException {
-
-        System.out.println("\n--- Поиск " + entityName + " по ID ---");
-        System.out.print("Введите ID: ");
-        int id = InputHelper.readInt(scanner.nextLine());
-
+    public static <T> void findEntityById(BaseDAO<T> dao, String entityName) throws SQLException {
+        log.info("\n--- Поиск {} по ID ---", entityName);
+        int id = InputHelper.readInt("Введите ID: ");
         T entity = dao.findById(id);
         if (entity != null) {
-            System.out.println("Найден(а): " + entity);
+            log.info("Найден: {}", entity);
         } else {
-            System.out.println(entityName + " с ID " + id + " не найден(а).");
+            log.info("{}{}{}", entityName, " с ID ", id, MSG_NOT_FOUND_SINGLE);
         }
     }
 
-
-    public static <T> void updateEntity(
-      BaseDAO<T> dao,
-      String entityName,
-      Updater<T> updater) throws SQLException {
-
-        System.out.println("\n--- Обновление данных " + entityName + " ---");
-        System.out.print("Введите ID " + entityName + ": ");
-        int id = InputHelper.readInt(scanner.nextLine());
-
+    public static <T> void updateEntity(BaseDAO<T> dao, String entityName, Updater<T> updater) throws SQLException {
+        log.info("\n--- Обновление данных {} ---", entityName);
+        int id = InputHelper.readInt("Введите ID " + entityName + ": ");
         T entity = dao.findById(id);
         if (entity == null) {
-            System.out.println(entityName + " не найден(а).");
+            log.info("{}{}", entityName, MSG_NOT_FOUND_SINGLE);
             return;
         }
-
-        System.out.println("Текущие данные: " + entity);
-        System.out.println("(оставьте поле пустым, чтобы не менять)");
-
+        log.info("Текущие данные: {}", entity);
+        log.info("(оставьте поле пустым, чтобы не менять)");
         boolean updated = updater.update(entity);
         if (updated) {
             dao.update(entity);
-            System.out.println("Данные обновлены!");
+            log.info(MSG_UPDATED);
         } else {
-            System.out.println("Изменений не было.");
+            log.info(MSG_NO_CHANGES);
         }
     }
 
-
-    public static <T> void deleteEntity(
-      BaseDAO<T> dao,
-      String entityName) throws SQLException {
-
-        System.out.println("\n--- Удаление " + entityName + " ---");
-        System.out.print("Введите ID " + entityName + ": ");
-        int id = InputHelper.readInt(scanner.nextLine());
-
+    public static <T> void deleteEntity(BaseDAO<T> dao, String entityName) throws SQLException {
+        log.info("\n--- Удаление {} ---", entityName);
+        int id = InputHelper.readInt("Введите ID " + entityName + ": ");
         T entity = dao.findById(id);
         if (entity == null) {
-            System.out.println(entityName + " не найден(а).");
+            log.info("{}{}", entityName, MSG_NOT_FOUND_SINGLE);
             return;
         }
-
-        System.out.println("Вы уверены, что хотите удалить?");
+        log.info("Вы уверены, что хотите удалить?");
         System.out.print(entity + " (y/n): ");
         String confirm = scanner.nextLine();
-
         if (confirm.equalsIgnoreCase("y")) {
             dao.delete(id);
-            System.out.println(entityName + " удален(а)!");
+            log.info("{}{}", entityName, MSG_DELETED);
         } else {
-            System.out.println("Удаление отменено.");
+            log.info(MSG_DELETE_CANCELLED);
         }
     }
-
 
     @FunctionalInterface
     public interface Creator<T> {
@@ -119,6 +98,7 @@ public class CrudUtils {
         try {
             return (int) entity.getClass().getMethod("getId").invoke(entity);
         } catch (Exception e) {
+            log.error("Не удалось получить ID", e);
             return -1;
         }
     }

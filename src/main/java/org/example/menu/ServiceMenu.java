@@ -1,13 +1,15 @@
 package org.example.menu;
 
+import lombok.extern.slf4j.Slf4j;
 import org.example.models.Service;
 import org.example.utilities.InputHelper;
 import java.math.BigDecimal;
 
+@Slf4j
 public class ServiceMenu {
 
     public static Service createService() {
-        System.out.println("\n--- Добавление новой услуги ---");
+        log.info("\n--- Добавление новой услуги ---");
         String title = InputHelper.readNonEmptyString("Название: ");
         String description = InputHelper.readNonEmptyString("Описание: ");
         BigDecimal price = InputHelper.readBigDecimal("Цена: ");
@@ -17,8 +19,8 @@ public class ServiceMenu {
 
     public static boolean updateService(Service service) {
         boolean updated = false;
-        System.out.println("Текущие данные: " + service);
-        System.out.println("(оставьте поле пустым, чтобы не менять)");
+        log.info("Текущие данные: {}", service);
+        log.info("(оставьте поле пустым, чтобы не менять)");
 
         String title = InputHelper.readOptionalString("Новое название [" + service.getTitle() + "]: ");
         if (!title.isEmpty()) {

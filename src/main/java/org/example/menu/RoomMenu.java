@@ -1,24 +1,26 @@
 package org.example.menu;
 
+import lombok.extern.slf4j.Slf4j;
 import org.example.models.Room;
 import org.example.utilities.InputHelper;
 import java.math.BigDecimal;
 
+@Slf4j
 public class RoomMenu {
 
     public static Room createRoom() {
-        System.out.println("\n--- Добавление нового номера ---");
+        log.info("\n--- Добавление нового номера ---");
         int floor = InputHelper.readInt("Этаж: ");
-        String status = InputHelper.readNonEmptyString("Статус (свободно/занято/ремонт): ");
-        String type = InputHelper.readNonEmptyString("Тип (одноместный/двухместный/люкс): ");
+        String status = InputHelper.readNonEmptyString("Статус: ");
+        String type = InputHelper.readNonEmptyString("Тип: ");
         BigDecimal price = InputHelper.readBigDecimal("Цена: ");
         return new Room(floor, status, type, price);
     }
 
     public static boolean updateRoom(Room room) {
         boolean updated = false;
-        System.out.println("Текущие данные: " + room);
-        System.out.println("(оставьте поле пустым, чтобы не менять)");
+        log.info("Текущие данные: {}", room);
+        log.info("(оставьте поле пустым, чтобы не менять)");
 
         int newFloor = InputHelper.readOptionalInt("Новый этаж [" + room.getFloor() + "]: ", room.getFloor());
         if (newFloor != room.getFloor()) {

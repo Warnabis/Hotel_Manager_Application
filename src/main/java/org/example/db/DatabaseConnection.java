@@ -4,9 +4,9 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 public class DatabaseConnection {
-    public static String url = "jdbc:postgresql://localhost:5432/Hotel";
-    public static String user = "postgres";
-    public static String password = System.getenv("POSTGRES_PASSWORD");
+    public static final String url = "jdbc:postgresql://localhost:5432/Hotel";
+    public static final String user = "postgres";
+    public static final String password = System.getenv("POSTGRES_PASSWORD");
 
     public static Connection getConnection() throws SQLException {
         try {

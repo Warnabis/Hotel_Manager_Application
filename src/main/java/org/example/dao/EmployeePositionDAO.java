@@ -30,27 +30,21 @@ public class EmployeePositionDAO implements BaseDAO<EmployeePosition> {
         }
     }
 
-
     @Override
     public void update(EmployeePosition relation) throws SQLException {
         String sql = "UPDATE public.employee_position SET employee_id = ?, position_id = ? WHERE id = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, relation.getEmployeeId());
             pstmt.setInt(2, relation.getPositionId());
+            pstmt.setInt(3, relation.getId());
             pstmt.executeUpdate();
-
-            try (ResultSet rs = pstmt.getGeneratedKeys()) {
-                if (rs.next()) {
-                    relation.setId(rs.getInt(1));
-                }
-            }
         }
     }
 
     @Override
     public List<EmployeePosition> findAll() throws SQLException {
         List<EmployeePosition> relations = new ArrayList<>();
-        String sql = "SELECT * FROM public.employee_position ORDER BY id";
+        String sql = "SELECT id, employee_id, position_id FROM public.employee_position ORDER BY id";
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
@@ -66,7 +60,7 @@ public class EmployeePositionDAO implements BaseDAO<EmployeePosition> {
 
     @Override
     public EmployeePosition findById(int id) throws SQLException {
-        String sql = "SELECT * FROM public.employee_position WHERE id = ?";
+        String sql = "SELECT id, employee_id, position_id FROM public.employee_position WHERE id = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             try (ResultSet rs = pstmt.executeQuery()) {
@@ -94,7 +88,7 @@ public class EmployeePositionDAO implements BaseDAO<EmployeePosition> {
     public List<Position> getPositionsByEmployeeId(int employeeId) throws SQLException {
         List<Position> positions = new ArrayList<>();
         String sql = """
-            SELECT p.* FROM public.position p
+            SELECT p.id, p.title, p.salary, p.responsibilities FROM public.position p
             JOIN public.employee_position ep ON p.id = ep.position_id
             WHERE ep.employee_id = ?
             ORDER BY p.id
@@ -118,7 +112,7 @@ public class EmployeePositionDAO implements BaseDAO<EmployeePosition> {
     public List<Employee> getEmployeesByPositionId(int positionId) throws SQLException {
         List<Employee> employees = new ArrayList<>();
         String sql = """
-            SELECT e.* FROM public.employee e
+            SELECT e.id, e.full_name, e.phone_number, e.experience, e.schedule FROM public.employee e
             JOIN public.employee_position ep ON e.id = ep.employee_id
             WHERE ep.position_id = ?
             ORDER BY e.id

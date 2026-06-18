@@ -44,7 +44,7 @@ public class ServiceEmployeeDAO implements BaseDAO<ServiceEmployee> {
     @Override
     public List<ServiceEmployee> findAll() throws SQLException {
         List<ServiceEmployee> relations = new ArrayList<>();
-        String sql = "SELECT * FROM public.service_employee ORDER BY id";
+        String sql = "SELECT id, service_id, employee_id FROM public.service_employee ORDER BY id";
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
@@ -60,7 +60,7 @@ public class ServiceEmployeeDAO implements BaseDAO<ServiceEmployee> {
 
     @Override
     public ServiceEmployee findById(int id) throws SQLException {
-        String sql = "SELECT * FROM public.service_employee WHERE id = ?";
+        String sql = "SELECT id, service_id, employee_id FROM public.service_employee WHERE id = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             try (ResultSet rs = pstmt.executeQuery()) {
@@ -88,7 +88,7 @@ public class ServiceEmployeeDAO implements BaseDAO<ServiceEmployee> {
     public List<Employee> getEmployeesByServiceId(int serviceId) throws SQLException {
         List<Employee> employees = new ArrayList<>();
         String sql = """
-            SELECT e.* FROM public.employee e
+            SELECT e.id, e.full_name, e.phone_number, e.experience, e.schedule FROM public.employee e
             JOIN public.service_employee se ON e.id = se.employee_id
             WHERE se.service_id = ?
             ORDER BY e.id
@@ -113,7 +113,7 @@ public class ServiceEmployeeDAO implements BaseDAO<ServiceEmployee> {
     public List<Service> getServicesByEmployeeId(int employeeId) throws SQLException {
         List<Service> services = new ArrayList<>();
         String sql = """
-            SELECT s.* FROM public.service s
+            SELECT s.id, s.title, s.description, s.price, s.duration FROM public.service s
             JOIN public.service_employee se ON s.id = se.service_id
             WHERE se.employee_id = ?
             ORDER BY s.id
