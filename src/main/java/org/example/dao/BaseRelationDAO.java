@@ -131,4 +131,26 @@ public abstract class BaseRelationDAO<T> implements BaseDAO<T> {
             pstmt.executeUpdate();
         }
     }
+
+    protected <R> List<R> getRelatedEntities(int id, String targetTable, String joinColumn, String selectClause, RowMapper<R> mapper) throws SQLException {
+        List<R> result = new ArrayList<>();
+        String sql = "SELECT " + selectClause + " FROM " + targetTable + " t " +
+          "JOIN " + tableName + " rel ON t." + idColumn + " = rel." + joinColumn +
+          " WHERE rel." + (joinColumn.equals(leftColumn) ? rightColumn : leftColumn) + " = ?" +
+          " ORDER BY t." + idColumn;
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, id);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    result.add(mapper.mapRow(rs));
+                }
+            }
+        }
+        return result;
+    }
+
+    @FunctionalInterface
+    public interface RowMapper<R> {
+        R mapRow(ResultSet rs) throws SQLException;
+    }
 }

@@ -3,8 +3,8 @@ package org.example.dao;
 import org.example.models.EmployeePosition;
 import org.example.models.Employee;
 import org.example.models.Position;
-import java.sql.*;
-import java.util.ArrayList;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 
 public class EmployeePositionDAO extends BaseRelationDAO<EmployeePosition> {
@@ -34,51 +34,29 @@ public class EmployeePositionDAO extends BaseRelationDAO<EmployeePosition> {
     }
 
     public List<Position> getPositionsByEmployeeId(int employeeId) throws SQLException {
-        List<Position> positions = new ArrayList<>();
-        String sql = """
-            SELECT p.id, p.title, p.salary, p.responsibilities FROM public.position p
-            JOIN public.employee_position ep ON p.id = ep.position_id
-            WHERE ep.employee_id = ?
-            ORDER BY p.id
-        """;
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, employeeId);
-            try (ResultSet rs = pstmt.executeQuery()) {
-                while (rs.next()) {
-                    Position position = new Position();
-                    position.setId(rs.getInt("id"));
-                    position.setTitle(rs.getString("title"));
-                    position.setSalary(rs.getBigDecimal("salary"));
-                    position.setResponsibilities(rs.getString("responsibilities"));
-                    positions.add(position);
-                }
-            }
-        }
-        return positions;
+        return getRelatedEntities(employeeId, "public.position", "position_id",
+          "p.id, p.title, p.salary, p.responsibilities",
+          rs -> {
+              Position p = new Position();
+              p.setId(rs.getInt("id"));
+              p.setTitle(rs.getString("title"));
+              p.setSalary(rs.getBigDecimal("salary"));
+              p.setResponsibilities(rs.getString("responsibilities"));
+              return p;
+          });
     }
 
     public List<Employee> getEmployeesByPositionId(int positionId) throws SQLException {
-        List<Employee> employees = new ArrayList<>();
-        String sql = """
-            SELECT e.id, e.full_name, e.phone_number, e.experience, e.schedule FROM public.employee e
-            JOIN public.employee_position ep ON e.id = ep.employee_id
-            WHERE ep.position_id = ?
-            ORDER BY e.id
-        """;
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, positionId);
-            try (ResultSet rs = pstmt.executeQuery()) {
-                while (rs.next()) {
-                    Employee employee = new Employee();
-                    employee.setId(rs.getInt("id"));
-                    employee.setFullName(rs.getString("full_name"));
-                    employee.setPhoneNumber(rs.getString("phone_number"));
-                    employee.setExperience(rs.getString("experience"));
-                    employee.setSchedule(rs.getString("schedule"));
-                    employees.add(employee);
-                }
-            }
-        }
-        return employees;
+        return getRelatedEntities(positionId, "public.employee", "employee_id",
+          "e.id, e.full_name, e.phone_number, e.experience, e.schedule",
+          rs -> {
+              Employee e = new Employee();
+              e.setId(rs.getInt("id"));
+              e.setFullName(rs.getString("full_name"));
+              e.setPhoneNumber(rs.getString("phone_number"));
+              e.setExperience(rs.getString("experience"));
+              e.setSchedule(rs.getString("schedule"));
+              return e;
+          });
     }
 }

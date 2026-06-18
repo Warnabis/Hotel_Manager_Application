@@ -3,8 +3,9 @@ package org.example.dao;
 import org.example.models.RoomBooking;
 import org.example.models.Room;
 import org.example.models.Booking;
-import java.sql.*;
-import java.util.ArrayList;
+
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 
 public class RoomBookingDAO extends BaseRelationDAO<RoomBooking> {
@@ -34,53 +35,31 @@ public class RoomBookingDAO extends BaseRelationDAO<RoomBooking> {
     }
 
     public List<Room> getRoomsByBookingId(int bookingId) throws SQLException {
-        List<Room> rooms = new ArrayList<>();
-        String sql = """
-            SELECT r.id, r.floor, r.status, r.type, r.price FROM public.room r
-            JOIN public.room_booking rb ON r.id = rb.room_id
-            WHERE rb.booking_id = ?
-            ORDER BY r.id
-        """;
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, bookingId);
-            try (ResultSet rs = pstmt.executeQuery()) {
-                while (rs.next()) {
-                    Room room = new Room();
-                    room.setId(rs.getInt("id"));
-                    room.setFloor(rs.getInt("floor"));
-                    room.setStatus(rs.getString("status"));
-                    room.setType(rs.getString("type"));
-                    room.setPrice(rs.getBigDecimal("price"));
-                    rooms.add(room);
-                }
-            }
-        }
-        return rooms;
+        return getRelatedEntities(bookingId, "public.room", "room_id",
+          "r.id, r.floor, r.status, r.type, r.price",
+          rs -> {
+              Room r = new Room();
+              r.setId(rs.getInt("id"));
+              r.setFloor(rs.getInt("floor"));
+              r.setStatus(rs.getString("status"));
+              r.setType(rs.getString("type"));
+              r.setPrice(rs.getBigDecimal("price"));
+              return r;
+          });
     }
 
     public List<Booking> getBookingsByRoomId(int roomId) throws SQLException {
-        List<Booking> bookings = new ArrayList<>();
-        String sql = """
-            SELECT b.id, b.price, b.status, b.check_in, b.duration, b.guest_id FROM public.booking b
-            JOIN public.room_booking rb ON b.id = rb.booking_id
-            WHERE rb.room_id = ?
-            ORDER BY b.id
-        """;
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, roomId);
-            try (ResultSet rs = pstmt.executeQuery()) {
-                while (rs.next()) {
-                    Booking booking = new Booking();
-                    booking.setId(rs.getInt("id"));
-                    booking.setPrice(rs.getBigDecimal("price"));
-                    booking.setStatus(rs.getString("status"));
-                    booking.setCheckInDate(rs.getDate("check_in").toLocalDate());
-                    booking.setDuration(rs.getString("duration"));
-                    booking.setGuestId(rs.getInt("guest_id"));
-                    bookings.add(booking);
-                }
-            }
-        }
-        return bookings;
+        return getRelatedEntities(roomId, "public.booking", "booking_id",
+          "b.id, b.price, b.status, b.check_in, b.duration, b.guest_id",
+          rs -> {
+              Booking b = new Booking();
+              b.setId(rs.getInt("id"));
+              b.setPrice(rs.getBigDecimal("price"));
+              b.setStatus(rs.getString("status"));
+              b.setCheckInDate(rs.getDate("check_in").toLocalDate());
+              b.setDuration(rs.getString("duration"));
+              b.setGuestId(rs.getInt("guest_id"));
+              return b;
+          });
     }
 }
