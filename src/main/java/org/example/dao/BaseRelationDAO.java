@@ -23,9 +23,9 @@ public abstract class BaseRelationDAO<T> implements BaseDAO<T> {
 
     protected BaseRelationDAO(Connection connection, String tableName, String leftColumn, String rightColumn) {
         this.connection = connection;
-        this.tableName = tableName;
-        this.leftColumn = leftColumn;
-        this.rightColumn = rightColumn;
+        this.tableName = DaoUtils.sanitizeTableName(tableName);
+        this.leftColumn = DaoUtils.sanitizeColumnName(leftColumn);
+        this.rightColumn = DaoUtils.sanitizeColumnName(rightColumn);
     }
 
     protected abstract int getLeftId(T entity);
@@ -114,12 +114,28 @@ public abstract class BaseRelationDAO<T> implements BaseDAO<T> {
         return false;
     }
 
+    public void deleteByLeftId(int leftId) throws SQLException {
+        String sql = String.format("DELETE FROM %s WHERE %s = ?", tableName, leftColumn);
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, leftId);
+            pstmt.executeUpdate();
+        }
+    }
+
+    public void deleteByRightId(int rightId) throws SQLException {
+        String sql = String.format("DELETE FROM %s WHERE %s = ?", tableName, rightColumn);
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, rightId);
+            pstmt.executeUpdate();
+        }
+    }
+
     protected <R> List<R> getRelatedEntities(int id, String targetTable, String joinColumn, String selectClause, RowMapper<R> mapper) throws SQLException {
         List<R> result = new ArrayList<>();
         String joinCondition = joinColumn.equals(leftColumn) ? rightColumn : leftColumn;
-        String sql = "SELECT " + selectClause + " FROM " + targetTable + " t " +
-          "JOIN " + tableName + " rel ON t." + ID_COLUMN + " = rel." + joinColumn +
-          " WHERE rel." + joinCondition + " = ?" +
+        String sql = "SELECT " + selectClause + " FROM " + DaoUtils.sanitizeTableName(targetTable) + " t " +
+          "JOIN " + tableName + " rel ON t." + ID_COLUMN + " = rel." + DaoUtils.sanitizeColumnName(joinColumn) +
+          " WHERE rel." + DaoUtils.sanitizeColumnName(joinCondition) + " = ?" +
           " ORDER BY t." + ID_COLUMN;
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, id);

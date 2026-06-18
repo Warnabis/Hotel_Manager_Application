@@ -9,11 +9,15 @@ public abstract class BaseEntityDAO<T> implements BaseDAO<T> {
 
     protected final Connection connection;
     protected final String tableName;
-    protected final static String idColumn = "id";
+    protected static final String ID_COLUMN = "id";
+
+    private static final String SELECT_ALL_TEMPLATE = "SELECT * FROM %s ORDER BY %s";
+    private static final String SELECT_BY_ID_TEMPLATE = "SELECT * FROM %s WHERE %s = ?";
+    private static final String DELETE_BY_ID_TEMPLATE = "DELETE FROM %s WHERE %s = ?";
 
     protected BaseEntityDAO(Connection connection, String tableName) {
         this.connection = connection;
-        this.tableName = tableName;
+        this.tableName = DaoUtils.sanitizeTableName(tableName);
     }
 
     protected abstract String getInsertSql();
@@ -38,7 +42,7 @@ public abstract class BaseEntityDAO<T> implements BaseDAO<T> {
     @Override
     public List<T> findAll() throws SQLException {
         List<T> list = new ArrayList<>();
-        String sql = "SELECT * FROM " + tableName + " ORDER BY " + idColumn;
+        String sql = String.format(SELECT_ALL_TEMPLATE, tableName, ID_COLUMN);
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
@@ -50,7 +54,7 @@ public abstract class BaseEntityDAO<T> implements BaseDAO<T> {
 
     @Override
     public T findById(int id) throws SQLException {
-        String sql = "SELECT * FROM " + tableName + " WHERE " + idColumn + " = ?";
+        String sql = String.format(SELECT_BY_ID_TEMPLATE, tableName, ID_COLUMN);
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             try (ResultSet rs = pstmt.executeQuery()) {
@@ -73,7 +77,7 @@ public abstract class BaseEntityDAO<T> implements BaseDAO<T> {
 
     @Override
     public void delete(int id) throws SQLException {
-        String sql = "DELETE FROM " + tableName + " WHERE " + idColumn + " = ?";
+        String sql = String.format(DELETE_BY_ID_TEMPLATE, tableName, ID_COLUMN);
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             pstmt.executeUpdate();

@@ -57,20 +57,18 @@ public class ServiceDAO extends BaseEntityDAO<Service> {
         pstmt.setInt(5, service.getId());
     }
 
+    private void executeDeleteQuery(String query, int id) throws SQLException {
+        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+            pstmt.setInt(1, id);
+            pstmt.executeUpdate();
+        }
+    }
+
     @Override
     public void delete(int id) throws SQLException {
-        String[] deleteQueries = {
-          "DELETE FROM public.service_employee WHERE service_id = ?",
-          "DELETE FROM public.service_guest WHERE service_id = ?",
-          "DELETE FROM public.service_payment WHERE service_id = ?"
-        };
-
-        for (String query : deleteQueries) {
-            try (PreparedStatement pstmt = connection.prepareStatement(query)) {
-                pstmt.setInt(1, id);
-                pstmt.executeUpdate();
-            }
-        }
+        executeDeleteQuery("DELETE FROM public.service_employee WHERE service_id = ?", id);
+        executeDeleteQuery("DELETE FROM public.service_guest WHERE service_id = ?", id);
+        executeDeleteQuery("DELETE FROM public.service_payment WHERE service_id = ?", id);
         super.delete(id);
     }
 }

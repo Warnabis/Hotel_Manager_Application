@@ -6,15 +6,24 @@ public final class DaoUtils {
 
     private DaoUtils() {}
 
-    private static String sanitizeTableName(String tableName) {
+    public static String sanitizeTableName(String tableName) {
         if (tableName == null || tableName.trim().isEmpty()) {
             throw new IllegalArgumentException("Имя таблицы не может быть пустым");
         }
-
         if (!tableName.matches("^[a-zA-Z0-9_.]+$")) {
             throw new IllegalArgumentException("Недопустимое имя таблицы: " + tableName);
         }
         return tableName;
+    }
+
+    public static String sanitizeColumnName(String columnName) {
+        if (columnName == null || columnName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Имя колонки не может быть пустым");
+        }
+        if (!columnName.matches("^[a-zA-Z0-9_]+$")) {
+            throw new IllegalArgumentException("Недопустимое имя колонки: " + columnName);
+        }
+        return columnName;
     }
 
     public static int getGeneratedId(PreparedStatement pstmt, Connection connection, String tableName) throws SQLException {
