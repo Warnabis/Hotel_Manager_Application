@@ -1,5 +1,7 @@
 package org.example.dao;
 
+import org.example.utilities.DaoUtils;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,19 +33,8 @@ public abstract class BaseRelationDAO<T> implements BaseDAO<T> {
             pstmt.setInt(1, getLeftId(entity));
             pstmt.setInt(2, getRightId(entity));
             pstmt.executeUpdate();
-            try (ResultSet rs = pstmt.getGeneratedKeys()) {
-                if (rs.next()) {
-                    setId(entity, rs.getInt(1));
-                } else {
-                    String maxSql = "SELECT COALESCE(MAX(id), 0) + 1 FROM " + tableName;
-                    try (Statement stmt = connection.createStatement();
-                         ResultSet maxRs = stmt.executeQuery(maxSql)) {
-                        if (maxRs.next()) {
-                            setId(entity, maxRs.getInt(1));
-                        }
-                    }
-                }
-            }
+            int id = DaoUtils.getGeneratedId(pstmt, connection, tableName);
+            setId(entity, id);
         }
     }
 
