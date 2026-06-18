@@ -6,25 +6,16 @@ import org.example.models.ServicePayment;
 import org.example.models.Payment;
 import org.example.models.Service;
 import org.example.utilities.InputHelper;
+
 import java.sql.SQLException;
 import java.util.List;
+
+import static org.example.menu.MenuConstants.*;
 
 @Slf4j
 public class ServicePaymentMenu {
 
     private ServicePaymentMenu() {}
-
-    private static final String MSG_RELATION_EXISTS = "Такая связь уже существует!";
-    private static final String MSG_RELATION_CREATED = "Связь создана! ID: ";
-    private static final String MSG_NO_RELATIONS = "Связей не найдено";
-    private static final String MSG_TOTAL = "Всего: ";
-    private static final String MSG_NOT_FOUND = "Связь не найдена!";
-    private static final String MSG_UPDATED = "Связь обновлена!";
-    private static final String MSG_NO_CHANGES = "Изменений не было.";
-    private static final String MSG_DELETED = "Связь удалена!";
-    private static final String MSG_DELETE_CANCELLED = "Удаление отменено.";
-    private static final String MSG_SERVICES_DELETED = "Все связи услуги удалены!";
-    private static final String MSG_PAYMENTS_DELETED = "Все связи платежа удалены!";
 
     public static void create(ServicePaymentDAO dao) throws SQLException {
         log.info("\n--- Добавление связи услуга-платеж ---");
@@ -116,26 +107,6 @@ public class ServicePaymentMenu {
         } else {
             services.forEach(service -> log.info(service.toString()));
             log.info(MSG_TOTAL + services.size());
-        }
-    }
-
-    public static void deleteByServiceId(ServicePaymentDAO dao) throws SQLException {
-        int serviceId = InputHelper.readInt("Введите ID услуги: ");
-        if (InputHelper.confirmAction("Удалить все связи услуги")) {
-            dao.deleteByServiceId(serviceId);
-            log.info(MSG_SERVICES_DELETED);
-        } else {
-            log.info(MSG_DELETE_CANCELLED);
-        }
-    }
-
-    public static void deleteByPaymentId(ServicePaymentDAO dao) throws SQLException {
-        int paymentId = InputHelper.readInt("Введите ID платежа: ");
-        if (InputHelper.confirmAction("Удалить все связи платежа")) {
-            dao.deleteByPaymentId(paymentId);
-            log.info(MSG_PAYMENTS_DELETED);
-        } else {
-            log.info(MSG_DELETE_CANCELLED);
         }
     }
 }

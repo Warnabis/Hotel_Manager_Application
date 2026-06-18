@@ -7,82 +7,30 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ServiceEmployeeDAO implements BaseDAO<ServiceEmployee> {
-    private final Connection connection;
+public class ServiceEmployeeDAO extends BaseRelationDAO<ServiceEmployee> {
 
     public ServiceEmployeeDAO(Connection connection) {
-        this.connection = connection;
+        super(connection, "public.service_employee", "service_id", "employee_id");
     }
 
     @Override
-    public void create(ServiceEmployee relation) throws SQLException {
-        String sql = "INSERT INTO public.service_employee (service_id, employee_id) VALUES (?, ?)";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            pstmt.setInt(1, relation.getServiceId());
-            pstmt.setInt(2, relation.getEmployeeId());
-            pstmt.executeUpdate();
-
-            try (ResultSet rs = pstmt.getGeneratedKeys()) {
-                if (rs.next()) {
-                    relation.setId(rs.getInt(1));
-                }
-            }
-        }
+    protected int getLeftId(ServiceEmployee entity) {
+        return entity.getServiceId();
     }
 
     @Override
-    public void update(ServiceEmployee relation) throws SQLException {
-        String sql = "UPDATE public.service_employee SET service_id = ?, employee_id = ? WHERE id = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, relation.getServiceId());
-            pstmt.setInt(2, relation.getEmployeeId());
-            pstmt.setInt(3, relation.getId());
-            pstmt.executeUpdate();
-        }
+    protected int getRightId(ServiceEmployee entity) {
+        return entity.getEmployeeId();
     }
 
     @Override
-    public List<ServiceEmployee> findAll() throws SQLException {
-        List<ServiceEmployee> relations = new ArrayList<>();
-        String sql = "SELECT id, service_id, employee_id FROM public.service_employee ORDER BY id";
-        try (Statement stmt = connection.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-            while (rs.next()) {
-                relations.add(new ServiceEmployee(
-                  rs.getInt("id"),
-                  rs.getInt("service_id"),
-                  rs.getInt("employee_id")
-                ));
-            }
-        }
-        return relations;
+    protected ServiceEmployee createInstance(int id, int leftId, int rightId) {
+        return new ServiceEmployee(id, leftId, rightId);
     }
 
     @Override
-    public ServiceEmployee findById(int id) throws SQLException {
-        String sql = "SELECT id, service_id, employee_id FROM public.service_employee WHERE id = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, id);
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    return new ServiceEmployee(
-                      rs.getInt("id"),
-                      rs.getInt("service_id"),
-                      rs.getInt("employee_id")
-                    );
-                }
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public void delete(int id) throws SQLException {
-        String sql = "DELETE FROM public.service_employee WHERE id = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, id);
-            pstmt.executeUpdate();
-        }
+    protected void setId(ServiceEmployee entity, int id) {
+        entity.setId(id);
     }
 
     public List<Employee> getEmployeesByServiceId(int serviceId) throws SQLException {
@@ -133,35 +81,5 @@ public class ServiceEmployeeDAO implements BaseDAO<ServiceEmployee> {
             }
         }
         return services;
-    }
-
-    public boolean exists(int serviceId, int employeeId) throws SQLException {
-        String sql = "SELECT COUNT(*) FROM public.service_employee WHERE service_id = ? AND employee_id = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, serviceId);
-            pstmt.setInt(2, employeeId);
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1) > 0;
-                }
-            }
-        }
-        return false;
-    }
-
-    public void deleteByServiceId(int serviceId) throws SQLException {
-        String sql = "DELETE FROM public.service_employee WHERE service_id = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, serviceId);
-            pstmt.executeUpdate();
-        }
-    }
-
-    public void deleteByEmployeeId(int employeeId) throws SQLException {
-        String sql = "DELETE FROM public.service_employee WHERE employee_id = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, employeeId);
-            pstmt.executeUpdate();
-        }
     }
 }

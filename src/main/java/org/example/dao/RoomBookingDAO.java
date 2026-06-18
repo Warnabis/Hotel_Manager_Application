@@ -7,82 +7,30 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RoomBookingDAO implements BaseDAO<RoomBooking> {
-    private final Connection connection;
+public class RoomBookingDAO extends BaseRelationDAO<RoomBooking> {
 
     public RoomBookingDAO(Connection connection) {
-        this.connection = connection;
+        super(connection, "public.room_booking", "room_id", "booking_id");
     }
 
     @Override
-    public void create(RoomBooking relation) throws SQLException {
-        String sql = "INSERT INTO public.room_booking (room_id, booking_id) VALUES (?, ?)";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            pstmt.setInt(1, relation.getRoomId());
-            pstmt.setInt(2, relation.getBookingId());
-            pstmt.executeUpdate();
-
-            try (ResultSet rs = pstmt.getGeneratedKeys()) {
-                if (rs.next()) {
-                    relation.setId(rs.getInt(1));
-                }
-            }
-        }
+    protected int getLeftId(RoomBooking entity) {
+        return entity.getRoomId();
     }
 
     @Override
-    public void update(RoomBooking relation) throws SQLException {
-        String sql = "UPDATE public.room_booking SET room_id = ?, booking_id = ? WHERE id = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, relation.getRoomId());
-            pstmt.setInt(2, relation.getBookingId());
-            pstmt.setInt(3, relation.getId());
-            pstmt.executeUpdate();
-        }
+    protected int getRightId(RoomBooking entity) {
+        return entity.getBookingId();
     }
 
     @Override
-    public List<RoomBooking> findAll() throws SQLException {
-        List<RoomBooking> relations = new ArrayList<>();
-        String sql = "SELECT id, room_id, booking_id FROM public.room_booking ORDER BY id";
-        try (Statement stmt = connection.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-            while (rs.next()) {
-                relations.add(new RoomBooking(
-                  rs.getInt("id"),
-                  rs.getInt("room_id"),
-                  rs.getInt("booking_id")
-                ));
-            }
-        }
-        return relations;
+    protected RoomBooking createInstance(int id, int leftId, int rightId) {
+        return new RoomBooking(id, leftId, rightId);
     }
 
     @Override
-    public RoomBooking findById(int id) throws SQLException {
-        String sql = "SELECT id, room_id, booking_id FROM public.room_booking WHERE id = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, id);
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    return new RoomBooking(
-                      rs.getInt("id"),
-                      rs.getInt("room_id"),
-                      rs.getInt("booking_id")
-                    );
-                }
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public void delete(int id) throws SQLException {
-        String sql = "DELETE FROM public.room_booking WHERE id = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, id);
-            pstmt.executeUpdate();
-        }
+    protected void setId(RoomBooking entity, int id) {
+        entity.setId(id);
     }
 
     public List<Room> getRoomsByBookingId(int bookingId) throws SQLException {
@@ -134,35 +82,5 @@ public class RoomBookingDAO implements BaseDAO<RoomBooking> {
             }
         }
         return bookings;
-    }
-
-    public boolean exists(int roomId, int bookingId) throws SQLException {
-        String sql = "SELECT COUNT(*) FROM public.room_booking WHERE room_id = ? AND booking_id = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, roomId);
-            pstmt.setInt(2, bookingId);
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1) > 0;
-                }
-            }
-        }
-        return false;
-    }
-
-    public void deleteByRoomId(int roomId) throws SQLException {
-        String sql = "DELETE FROM public.room_booking WHERE room_id = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, roomId);
-            pstmt.executeUpdate();
-        }
-    }
-
-    public void deleteByBookingId(int bookingId) throws SQLException {
-        String sql = "DELETE FROM public.room_booking WHERE booking_id = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, bookingId);
-            pstmt.executeUpdate();
-        }
     }
 }

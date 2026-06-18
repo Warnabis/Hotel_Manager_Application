@@ -6,25 +6,16 @@ import org.example.models.BookingPayment;
 import org.example.models.Payment;
 import org.example.models.Booking;
 import org.example.utilities.InputHelper;
+
 import java.sql.SQLException;
 import java.util.List;
+
+import static org.example.menu.MenuConstants.*;
 
 @Slf4j
 public class BookingPaymentMenu {
 
     private BookingPaymentMenu() {}
-
-    private static final String MSG_RELATION_EXISTS = "Такая связь уже существует!";
-    private static final String MSG_RELATION_CREATED = "Связь создана! ID: ";
-    private static final String MSG_NO_RELATIONS = "Связей не найдено";
-    private static final String MSG_TOTAL = "Всего: ";
-    private static final String MSG_NOT_FOUND = "Связь не найдена!";
-    private static final String MSG_UPDATED = "Связь обновлена!";
-    private static final String MSG_NO_CHANGES = "Изменений не было.";
-    private static final String MSG_DELETED = "Связь удалена!";
-    private static final String MSG_DELETE_CANCELLED = "Удаление отменено.";
-    private static final String MSG_BOOKINGS_DELETED = "Все связи бронирования удалены!";
-    private static final String MSG_PAYMENTS_DELETED = "Все связи платежа удалены!";
 
     public static void create(BookingPaymentDAO dao) throws SQLException {
         log.info("\n--- Добавление связи бронирование-платеж ---");
@@ -119,23 +110,4 @@ public class BookingPaymentMenu {
         }
     }
 
-    public static void deleteByBookingId(BookingPaymentDAO dao) throws SQLException {
-        int bookingId = InputHelper.readInt("Введите ID бронирования: ");
-        if (InputHelper.confirmAction("Удалить все связи бронирования")) {
-            dao.deleteByBookingId(bookingId);
-            log.info(MSG_BOOKINGS_DELETED);
-        } else {
-            log.info(MSG_DELETE_CANCELLED);
-        }
-    }
-
-    public static void deleteByPaymentId(BookingPaymentDAO dao) throws SQLException {
-        int paymentId = InputHelper.readInt("Введите ID платежа: ");
-        if (InputHelper.confirmAction("Удалить все связи платежа")) {
-            dao.deleteByPaymentId(paymentId);
-            log.info(MSG_PAYMENTS_DELETED);
-        } else {
-            log.info(MSG_DELETE_CANCELLED);
-        }
-    }
 }

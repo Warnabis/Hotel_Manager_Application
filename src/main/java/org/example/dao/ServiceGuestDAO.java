@@ -7,82 +7,30 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ServiceGuestDAO implements BaseDAO<ServiceGuest> {
-    private final Connection connection;
+public class ServiceGuestDAO extends BaseRelationDAO<ServiceGuest> {
 
     public ServiceGuestDAO(Connection connection) {
-        this.connection = connection;
+        super(connection, "public.service_guest", "service_id", "guest_id");
     }
 
     @Override
-    public void create(ServiceGuest relation) throws SQLException {
-        String sql = "INSERT INTO public.service_guest (service_id, guest_id) VALUES (?, ?)";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            pstmt.setInt(1, relation.getServiceId());
-            pstmt.setInt(2, relation.getGuestId());
-            pstmt.executeUpdate();
-
-            try (ResultSet rs = pstmt.getGeneratedKeys()) {
-                if (rs.next()) {
-                    relation.setId(rs.getInt(1));
-                }
-            }
-        }
+    protected int getLeftId(ServiceGuest entity) {
+        return entity.getServiceId();
     }
 
     @Override
-    public void update(ServiceGuest relation) throws SQLException {
-        String sql = "UPDATE public.service_guest SET service_id = ?, guest_id = ? WHERE id = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, relation.getServiceId());
-            pstmt.setInt(2, relation.getGuestId());
-            pstmt.setInt(3, relation.getId());
-            pstmt.executeUpdate();
-        }
+    protected int getRightId(ServiceGuest entity) {
+        return entity.getGuestId();
     }
 
     @Override
-    public List<ServiceGuest> findAll() throws SQLException {
-        List<ServiceGuest> relations = new ArrayList<>();
-        String sql = "SELECT id, service_id, guest_id FROM public.service_guest ORDER BY id";
-        try (Statement stmt = connection.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-            while (rs.next()) {
-                relations.add(new ServiceGuest(
-                  rs.getInt("id"),
-                  rs.getInt("service_id"),
-                  rs.getInt("guest_id")
-                ));
-            }
-        }
-        return relations;
+    protected ServiceGuest createInstance(int id, int leftId, int rightId) {
+        return new ServiceGuest(id, leftId, rightId);
     }
 
     @Override
-    public ServiceGuest findById(int id) throws SQLException {
-        String sql = "SELECT id, service_id, guest_id FROM public.service_guest WHERE id = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, id);
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    return new ServiceGuest(
-                      rs.getInt("id"),
-                      rs.getInt("service_id"),
-                      rs.getInt("guest_id")
-                    );
-                }
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public void delete(int id) throws SQLException {
-        String sql = "DELETE FROM public.service_guest WHERE id = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, id);
-            pstmt.executeUpdate();
-        }
+    protected void setId(ServiceGuest entity, int id) {
+        entity.setId(id);
     }
 
     public List<Guest> getGuestsByServiceId(int serviceId) throws SQLException {
@@ -133,35 +81,5 @@ public class ServiceGuestDAO implements BaseDAO<ServiceGuest> {
             }
         }
         return services;
-    }
-
-    public boolean exists(int serviceId, int guestId) throws SQLException {
-        String sql = "SELECT COUNT(*) FROM public.service_guest WHERE service_id = ? AND guest_id = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, serviceId);
-            pstmt.setInt(2, guestId);
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1) > 0;
-                }
-            }
-        }
-        return false;
-    }
-
-    public void deleteByServiceId(int serviceId) throws SQLException {
-        String sql = "DELETE FROM public.service_guest WHERE service_id = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, serviceId);
-            pstmt.executeUpdate();
-        }
-    }
-
-    public void deleteByGuestId(int guestId) throws SQLException {
-        String sql = "DELETE FROM public.service_guest WHERE guest_id = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, guestId);
-            pstmt.executeUpdate();
-        }
     }
 }

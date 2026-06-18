@@ -7,82 +7,30 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ServicePaymentDAO implements BaseDAO<ServicePayment> {
-    private final Connection connection;
+public class ServicePaymentDAO extends BaseRelationDAO<ServicePayment> {
 
     public ServicePaymentDAO(Connection connection) {
-        this.connection = connection;
+        super(connection, "public.service_payment", "service_id", "payment_id");
     }
 
     @Override
-    public void create(ServicePayment relation) throws SQLException {
-        String sql = "INSERT INTO public.service_payment (service_id, payment_id) VALUES (?, ?)";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            pstmt.setInt(1, relation.getServiceId());
-            pstmt.setInt(2, relation.getPaymentId());
-            pstmt.executeUpdate();
-
-            try (ResultSet rs = pstmt.getGeneratedKeys()) {
-                if (rs.next()) {
-                    relation.setId(rs.getInt(1));
-                }
-            }
-        }
+    protected int getLeftId(ServicePayment entity) {
+        return entity.getServiceId();
     }
 
     @Override
-    public void update(ServicePayment relation) throws SQLException {
-        String sql = "UPDATE public.service_payment SET service_id = ?, payment_id = ? WHERE id = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, relation.getServiceId());
-            pstmt.setInt(2, relation.getPaymentId());
-            pstmt.setInt(3, relation.getId());
-            pstmt.executeUpdate();
-        }
+    protected int getRightId(ServicePayment entity) {
+        return entity.getPaymentId();
     }
 
     @Override
-    public List<ServicePayment> findAll() throws SQLException {
-        List<ServicePayment> relations = new ArrayList<>();
-        String sql = "SELECT id, service_id, payment_id FROM public.service_payment ORDER BY id";
-        try (Statement stmt = connection.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-            while (rs.next()) {
-                relations.add(new ServicePayment(
-                  rs.getInt("id"),
-                  rs.getInt("service_id"),
-                  rs.getInt("payment_id")
-                ));
-            }
-        }
-        return relations;
+    protected ServicePayment createInstance(int id, int leftId, int rightId) {
+        return new ServicePayment(id, leftId, rightId);
     }
 
     @Override
-    public ServicePayment findById(int id) throws SQLException {
-        String sql = "SELECT id, service_id, payment_id FROM public.service_payment WHERE id = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, id);
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    return new ServicePayment(
-                      rs.getInt("id"),
-                      rs.getInt("service_id"),
-                      rs.getInt("payment_id")
-                    );
-                }
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public void delete(int id) throws SQLException {
-        String sql = "DELETE FROM public.service_payment WHERE id = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, id);
-            pstmt.executeUpdate();
-        }
+    protected void setId(ServicePayment entity, int id) {
+        entity.setId(id);
     }
 
     public List<Payment> getPaymentsByServiceId(int serviceId) throws SQLException {
@@ -134,35 +82,5 @@ public class ServicePaymentDAO implements BaseDAO<ServicePayment> {
             }
         }
         return services;
-    }
-
-    public boolean exists(int serviceId, int paymentId) throws SQLException {
-        String sql = "SELECT COUNT(*) FROM public.service_payment WHERE service_id = ? AND payment_id = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, serviceId);
-            pstmt.setInt(2, paymentId);
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1) > 0;
-                }
-            }
-        }
-        return false;
-    }
-
-    public void deleteByServiceId(int serviceId) throws SQLException {
-        String sql = "DELETE FROM public.service_payment WHERE service_id = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, serviceId);
-            pstmt.executeUpdate();
-        }
-    }
-
-    public void deleteByPaymentId(int paymentId) throws SQLException {
-        String sql = "DELETE FROM public.service_payment WHERE payment_id = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, paymentId);
-            pstmt.executeUpdate();
-        }
     }
 }

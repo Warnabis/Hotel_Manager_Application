@@ -6,25 +6,16 @@ import org.example.models.EmployeePosition;
 import org.example.models.Position;
 import org.example.models.Employee;
 import org.example.utilities.InputHelper;
+
 import java.sql.SQLException;
 import java.util.List;
+
+import static org.example.menu.MenuConstants.*;
 
 @Slf4j
 public class EmployeePositionMenu {
 
     private EmployeePositionMenu() {}
-
-    private static final String MSG_RELATION_EXISTS = "Такая связь уже существует!";
-    private static final String MSG_RELATION_CREATED = "Связь создана! ID: ";
-    private static final String MSG_NO_RELATIONS = "Связей не найдено";
-    private static final String MSG_TOTAL = "Всего: ";
-    private static final String MSG_NOT_FOUND = "Связь не найдена!";
-    private static final String MSG_UPDATED = "Связь обновлена!";
-    private static final String MSG_NO_CHANGES = "Изменений не было.";
-    private static final String MSG_DELETED = "Связь удалена!";
-    private static final String MSG_DELETE_CANCELLED = "Удаление отменено.";
-    private static final String MSG_EMPLOYEES_DELETED = "Все связи сотрудника удалены!";
-    private static final String MSG_POSITIONS_DELETED = "Все связи должности удалены!";
 
     public static void create(EmployeePositionDAO dao) throws SQLException {
         log.info("\n--- Добавление связи сотрудник-должность ---");
@@ -119,23 +110,4 @@ public class EmployeePositionMenu {
         }
     }
 
-    public static void deleteByEmployeeId(EmployeePositionDAO dao) throws SQLException {
-        int employeeId = InputHelper.readInt("Введите ID сотрудника: ");
-        if (InputHelper.confirmAction("Удалить все связи сотрудника")) {
-            dao.deleteByEmployeeId(employeeId);
-            log.info(MSG_EMPLOYEES_DELETED);
-        } else {
-            log.info(MSG_DELETE_CANCELLED);
-        }
-    }
-
-    public static void deleteByPositionId(EmployeePositionDAO dao) throws SQLException {
-        int positionId = InputHelper.readInt("Введите ID должности: ");
-        if (InputHelper.confirmAction("Удалить все связи должности")) {
-            dao.deleteByPositionId(positionId);
-            log.info(MSG_POSITIONS_DELETED);
-        } else {
-            log.info(MSG_DELETE_CANCELLED);
-        }
-    }
 }
