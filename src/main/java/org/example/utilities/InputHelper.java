@@ -1,5 +1,6 @@
 package org.example.utilities;
 
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -7,6 +8,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Scanner;
 
+@NoArgsConstructor
 @Slf4j
 public class InputHelper {
 
@@ -135,4 +137,6 @@ public class InputHelper {
             log.warn("Ошибка: введите y или n");
         }
     }
+
+
 }

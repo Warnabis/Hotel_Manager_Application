@@ -1,5 +1,6 @@
 package org.example.menu;
 
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.dao.RoomEmployeeDAO;
 import org.example.models.RoomEmployee;
@@ -9,6 +10,7 @@ import org.example.utilities.InputHelper;
 import java.sql.SQLException;
 import java.util.List;
 
+@NoArgsConstructor
 @Slf4j
 public class RoomEmployeeMenu {
 

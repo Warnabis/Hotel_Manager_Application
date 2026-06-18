@@ -13,7 +13,7 @@ public class CrudUtils {
     private static final String MSG_NOT_FOUND_SINGLE = " не найден.";
     private static final String MSG_NO_CHANGES = "Изменений не было.";
     private static final String MSG_UPDATED = "Данные обновлены!";
-    private static final String MSG_DELETED = " удален(а)!";
+    private static final String MSG_DELETED = " удален!";
     private static final String MSG_DELETE_CANCELLED = "Удаление отменено.";
 
     private static final Scanner scanner = new Scanner(System.in);
@@ -73,10 +73,7 @@ public class CrudUtils {
             log.info("{}{}", entityName, MSG_NOT_FOUND_SINGLE);
             return;
         }
-        log.info("Вы уверены, что хотите удалить?");
-        System.out.print(entity + " (y/n): ");
-        String confirm = scanner.nextLine();
-        if (confirm.equalsIgnoreCase("y")) {
+        if (InputHelper.confirmAction("Вы уверены, что хотите удалить? " + entity)) {
             dao.delete(id);
             log.info("{}{}", entityName, MSG_DELETED);
         } else {

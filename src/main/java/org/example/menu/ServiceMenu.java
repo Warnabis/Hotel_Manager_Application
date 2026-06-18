@@ -1,10 +1,12 @@
 package org.example.menu;
 
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.models.Service;
 import org.example.utilities.InputHelper;
 import java.math.BigDecimal;
 
+@NoArgsConstructor
 @Slf4j
 public class ServiceMenu {
 

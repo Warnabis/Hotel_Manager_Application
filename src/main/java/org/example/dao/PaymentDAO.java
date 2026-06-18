@@ -1,10 +1,7 @@
 package org.example.dao;
 
 import org.example.models.Payment;
-
-import java.math.BigDecimal;
 import java.sql.*;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 

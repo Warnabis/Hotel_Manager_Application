@@ -5,10 +5,8 @@ import org.example.dao.*;
 import org.example.menu.*;
 import org.example.db.DatabaseConnection;
 import org.example.utilities.InputHelper;
-
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Scanner;
 import static org.example.utilities.CrudUtils.*;
 
 @Slf4j
@@ -31,6 +29,7 @@ public class Main {
     private static final String RELATION_SERVICE_PAYMENT = "Услуга ↔ Платеж";
 
     private static final String MSG_INVALID_CHOICE = "Неверный выбор!";
+    private static final String USER_CHOICE = "Ваш выбор: ";
 
     private static GuestDAO guestDAO;
     private static RoomDAO roomDAO;
@@ -48,7 +47,6 @@ public class Main {
     private static ServiceGuestDAO serviceGuestDAO;
     private static ServicePaymentDAO servicePaymentDAO;
 
-    private static final Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
         try (Connection connection = DatabaseConnection.getConnection()) {
@@ -90,9 +88,8 @@ public class Main {
                     case 12 -> serviceEmployeeMenu();
                     case 13 -> serviceGuestMenu();
                     case 14 -> servicePaymentMenu();
-                    case 0 -> {
-                        System.exit(0);
-                    }
+                    case 0 -> System.exit(0);
+
                     default -> log.warn(MSG_INVALID_CHOICE);
                 }
             }
@@ -123,7 +120,7 @@ public class Main {
     private static void guestMenu() throws SQLException {
         while (true) {
             printEntityMenu(ENTITY_GUEST);
-            int choice = InputHelper.readMenuChoice("Ваш выбор: ");
+            int choice = InputHelper.readMenuChoice(USER_CHOICE);
 
             switch (choice) {
                 case 1 -> createEntity(guestDAO, ENTITY_GUEST, GuestMenu::createGuest);
@@ -140,7 +137,7 @@ public class Main {
     private static void roomMenu() throws SQLException {
         while (true) {
             printEntityMenu(ENTITY_ROOM);
-            int choice = InputHelper.readMenuChoice("Ваш выбор: ");
+            int choice = InputHelper.readMenuChoice(USER_CHOICE);
 
             switch (choice) {
                 case 1 -> createEntity(roomDAO, ENTITY_ROOM, RoomMenu::createRoom);
@@ -157,7 +154,7 @@ public class Main {
     private static void bookingMenu() throws SQLException {
         while (true) {
             printEntityMenu(ENTITY_BOOKING);
-            int choice = InputHelper.readMenuChoice("Ваш выбор: ");
+            int choice = InputHelper.readMenuChoice(USER_CHOICE);
 
             switch (choice) {
                 case 1 -> createEntity(bookingDAO, ENTITY_BOOKING, BookingMenu::createBooking);
@@ -174,7 +171,7 @@ public class Main {
     private static void employeeMenu() throws SQLException {
         while (true) {
             printEntityMenu(ENTITY_EMPLOYEE);
-            int choice = InputHelper.readMenuChoice("Ваш выбор: ");
+            int choice = InputHelper.readMenuChoice(USER_CHOICE);
 
             switch (choice) {
                 case 1 -> createEntity(employeeDAO, ENTITY_EMPLOYEE, EmployeeMenu::createEmployee);
@@ -191,7 +188,7 @@ public class Main {
     private static void serviceMenu() throws SQLException {
         while (true) {
             printEntityMenu(ENTITY_SERVICE);
-            int choice = InputHelper.readMenuChoice("Ваш выбор: ");
+            int choice = InputHelper.readMenuChoice(USER_CHOICE);
 
             switch (choice) {
                 case 1 -> createEntity(serviceDAO, ENTITY_SERVICE, ServiceMenu::createService);
@@ -208,7 +205,7 @@ public class Main {
     private static void positionMenu() throws SQLException {
         while (true) {
             printEntityMenu(ENTITY_POSITION);
-            int choice = InputHelper.readMenuChoice("Ваш выбор: ");
+            int choice = InputHelper.readMenuChoice(USER_CHOICE);
 
             switch (choice) {
                 case 1 -> createEntity(positionDAO, ENTITY_POSITION, PositionMenu::createPosition);
@@ -225,7 +222,7 @@ public class Main {
     private static void paymentMenu() throws SQLException {
         while (true) {
             printEntityMenu(ENTITY_PAYMENT);
-            int choice = InputHelper.readMenuChoice("Ваш выбор: ");
+            int choice = InputHelper.readMenuChoice(USER_CHOICE);
 
             switch (choice) {
                 case 1 -> createEntity(paymentDAO, ENTITY_PAYMENT, PaymentMenu::createPayment);
@@ -242,7 +239,7 @@ public class Main {
     private static void employeePositionMenu() throws SQLException {
         while (true) {
             printRelationMenu(RELATION_EMPLOYEE_POSITION);
-            int choice = InputHelper.readMenuChoice("Ваш выбор: ");
+            int choice = InputHelper.readMenuChoice(USER_CHOICE);
             switch (choice) {
                 case 1 -> EmployeePositionMenu.create(employeePositionDAO);
                 case 2 -> EmployeePositionMenu.findAll(employeePositionDAO);
@@ -262,7 +259,7 @@ public class Main {
     private static void roomBookingMenu() throws SQLException {
         while (true) {
             printRelationMenu(RELATION_ROOM_BOOKING);
-            int choice = InputHelper.readMenuChoice("Ваш выбор: ");
+            int choice = InputHelper.readMenuChoice(USER_CHOICE);
             switch (choice) {
                 case 1 -> RoomBookingMenu.create(roomBookingDAO);
                 case 2 -> RoomBookingMenu.findAll(roomBookingDAO);
@@ -282,7 +279,7 @@ public class Main {
     private static void bookingPaymentMenu() throws SQLException {
         while (true) {
             printRelationMenu(RELATION_BOOKING_PAYMENT);
-            int choice = InputHelper.readMenuChoice("Ваш выбор: ");
+            int choice = InputHelper.readMenuChoice(USER_CHOICE);
             switch (choice) {
                 case 1 -> BookingPaymentMenu.create(bookingPaymentDAO);
                 case 2 -> BookingPaymentMenu.findAll(bookingPaymentDAO);
@@ -302,7 +299,7 @@ public class Main {
     private static void roomEmployeeMenu() throws SQLException {
         while (true) {
             printRelationMenu(RELATION_ROOM_EMPLOYEE);
-            int choice = InputHelper.readMenuChoice("Ваш выбор: ");
+            int choice = InputHelper.readMenuChoice(USER_CHOICE);
             switch (choice) {
                 case 1 -> RoomEmployeeMenu.create(roomEmployeeDAO);
                 case 2 -> RoomEmployeeMenu.findAll(roomEmployeeDAO);
@@ -322,7 +319,7 @@ public class Main {
     private static void serviceEmployeeMenu() throws SQLException {
         while (true) {
             printRelationMenu(RELATION_SERVICE_EMPLOYEE);
-            int choice = InputHelper.readMenuChoice("Ваш выбор: ");
+            int choice = InputHelper.readMenuChoice(USER_CHOICE);
             switch (choice) {
                 case 1 -> ServiceEmployeeMenu.create(serviceEmployeeDAO);
                 case 2 -> ServiceEmployeeMenu.findAll(serviceEmployeeDAO);
@@ -342,7 +339,7 @@ public class Main {
     private static void serviceGuestMenu() throws SQLException {
         while (true) {
             printRelationMenu(RELATION_SERVICE_GUEST);
-            int choice = InputHelper.readMenuChoice("Ваш выбор: ");
+            int choice = InputHelper.readMenuChoice(USER_CHOICE);
             switch (choice) {
                 case 1 -> ServiceGuestMenu.create(serviceGuestDAO);
                 case 2 -> ServiceGuestMenu.findAll(serviceGuestDAO);
@@ -362,7 +359,7 @@ public class Main {
     private static void servicePaymentMenu() throws SQLException {
         while (true) {
             printRelationMenu(RELATION_SERVICE_PAYMENT);
-            int choice = InputHelper.readMenuChoice("Ваш выбор: ");
+            int choice = InputHelper.readMenuChoice(USER_CHOICE);
             switch (choice) {
                 case 1 -> ServicePaymentMenu.create(servicePaymentDAO);
                 case 2 -> ServicePaymentMenu.findAll(servicePaymentDAO);
