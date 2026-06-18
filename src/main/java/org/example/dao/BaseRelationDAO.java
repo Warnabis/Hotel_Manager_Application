@@ -10,9 +10,16 @@ public abstract class BaseRelationDAO<T> implements BaseDAO<T> {
 
     protected final Connection connection;
     protected final String tableName;
-    protected final String idColumn = "id";
+    protected static final String ID_COLUMN = "id";
     protected final String leftColumn;
     protected final String rightColumn;
+
+    private static final String SELECT_ALL_TEMPLATE = "SELECT %s, %s, %s FROM %s ORDER BY %s";
+    private static final String SELECT_BY_ID_TEMPLATE = "SELECT %s, %s, %s FROM %s WHERE %s = ?";
+    private static final String DELETE_BY_ID_TEMPLATE = "DELETE FROM %s WHERE %s = ?";
+    private static final String EXISTS_TEMPLATE = "SELECT COUNT(*) FROM %s WHERE %s = ? AND %s = ?";
+    private static final String INSERT_TEMPLATE = "INSERT INTO %s (%s, %s) VALUES (?, ?)";
+    private static final String UPDATE_TEMPLATE = "UPDATE %s SET %s = ?, %s = ? WHERE %s = ?";
 
     protected BaseRelationDAO(Connection connection, String tableName, String leftColumn, String rightColumn) {
         this.connection = connection;
@@ -28,7 +35,7 @@ public abstract class BaseRelationDAO<T> implements BaseDAO<T> {
 
     @Override
     public void create(T entity) throws SQLException {
-        String sql = "INSERT INTO " + tableName + " (" + leftColumn + ", " + rightColumn + ") VALUES (?, ?)";
+        String sql = String.format(INSERT_TEMPLATE, tableName, leftColumn, rightColumn);
         try (PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setInt(1, getLeftId(entity));
             pstmt.setInt(2, getRightId(entity));
@@ -40,7 +47,7 @@ public abstract class BaseRelationDAO<T> implements BaseDAO<T> {
 
     @Override
     public void update(T entity) throws SQLException {
-        String sql = "UPDATE " + tableName + " SET " + leftColumn + " = ?, " + rightColumn + " = ? WHERE " + idColumn + " = ?";
+        String sql = String.format(UPDATE_TEMPLATE, tableName, leftColumn, rightColumn, ID_COLUMN);
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, getLeftId(entity));
             pstmt.setInt(2, getRightId(entity));
@@ -60,11 +67,11 @@ public abstract class BaseRelationDAO<T> implements BaseDAO<T> {
     @Override
     public List<T> findAll() throws SQLException {
         List<T> list = new ArrayList<>();
-        String sql = "SELECT " + idColumn + ", " + leftColumn + ", " + rightColumn + " FROM " + tableName + " ORDER BY " + idColumn;
+        String sql = String.format(SELECT_ALL_TEMPLATE, ID_COLUMN, leftColumn, rightColumn, tableName, ID_COLUMN);
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
-                list.add(createInstance(rs.getInt(idColumn), rs.getInt(leftColumn), rs.getInt(rightColumn)));
+                list.add(createInstance(rs.getInt(ID_COLUMN), rs.getInt(leftColumn), rs.getInt(rightColumn)));
             }
         }
         return list;
@@ -72,12 +79,12 @@ public abstract class BaseRelationDAO<T> implements BaseDAO<T> {
 
     @Override
     public T findById(int id) throws SQLException {
-        String sql = "SELECT " + idColumn + ", " + leftColumn + ", " + rightColumn + " FROM " + tableName + " WHERE " + idColumn + " = ?";
+        String sql = String.format(SELECT_BY_ID_TEMPLATE, ID_COLUMN, leftColumn, rightColumn, tableName, ID_COLUMN);
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
-                    return createInstance(rs.getInt(idColumn), rs.getInt(leftColumn), rs.getInt(rightColumn));
+                    return createInstance(rs.getInt(ID_COLUMN), rs.getInt(leftColumn), rs.getInt(rightColumn));
                 }
             }
         }
@@ -86,7 +93,7 @@ public abstract class BaseRelationDAO<T> implements BaseDAO<T> {
 
     @Override
     public void delete(int id) throws SQLException {
-        String sql = "DELETE FROM " + tableName + " WHERE " + idColumn + " = ?";
+        String sql = String.format(DELETE_BY_ID_TEMPLATE, tableName, ID_COLUMN);
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             pstmt.executeUpdate();
@@ -94,7 +101,7 @@ public abstract class BaseRelationDAO<T> implements BaseDAO<T> {
     }
 
     public boolean exists(int leftId, int rightId) throws SQLException {
-        String sql = "SELECT COUNT(*) FROM " + tableName + " WHERE " + leftColumn + " = ? AND " + rightColumn + " = ?";
+        String sql = String.format(EXISTS_TEMPLATE, tableName, leftColumn, rightColumn);
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, leftId);
             pstmt.setInt(2, rightId);
@@ -107,28 +114,13 @@ public abstract class BaseRelationDAO<T> implements BaseDAO<T> {
         return false;
     }
 
-    public void deleteByLeftId(int leftId) throws SQLException {
-        String sql = "DELETE FROM " + tableName + " WHERE " + leftColumn + " = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, leftId);
-            pstmt.executeUpdate();
-        }
-    }
-
-    public void deleteByRightId(int rightId) throws SQLException {
-        String sql = "DELETE FROM " + tableName + " WHERE " + rightColumn + " = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, rightId);
-            pstmt.executeUpdate();
-        }
-    }
-
     protected <R> List<R> getRelatedEntities(int id, String targetTable, String joinColumn, String selectClause, RowMapper<R> mapper) throws SQLException {
         List<R> result = new ArrayList<>();
+        String joinCondition = joinColumn.equals(leftColumn) ? rightColumn : leftColumn;
         String sql = "SELECT " + selectClause + " FROM " + targetTable + " t " +
-          "JOIN " + tableName + " rel ON t." + idColumn + " = rel." + joinColumn +
-          " WHERE rel." + (joinColumn.equals(leftColumn) ? rightColumn : leftColumn) + " = ?" +
-          " ORDER BY t." + idColumn;
+          "JOIN " + tableName + " rel ON t." + ID_COLUMN + " = rel." + joinColumn +
+          " WHERE rel." + joinCondition + " = ?" +
+          " ORDER BY t." + ID_COLUMN;
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             try (ResultSet rs = pstmt.executeQuery()) {

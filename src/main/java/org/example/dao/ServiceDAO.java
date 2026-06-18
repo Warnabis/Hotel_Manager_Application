@@ -64,6 +64,7 @@ public class ServiceDAO extends BaseEntityDAO<Service> {
           "DELETE FROM public.service_guest WHERE service_id = ?",
           "DELETE FROM public.service_payment WHERE service_id = ?"
         };
+
         for (String query : deleteQueries) {
             try (PreparedStatement pstmt = connection.prepareStatement(query)) {
                 pstmt.setInt(1, id);

@@ -1,7 +1,6 @@
 package org.example.dao;
 
 import org.example.utilities.DaoUtils;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +9,7 @@ public abstract class BaseEntityDAO<T> implements BaseDAO<T> {
 
     protected final Connection connection;
     protected final String tableName;
-    protected final String idColumn = "id";
+    protected final static String idColumn = "id";
 
     protected BaseEntityDAO(Connection connection, String tableName) {
         this.connection = connection;
