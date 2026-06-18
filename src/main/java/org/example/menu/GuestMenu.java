@@ -1,13 +1,13 @@
 package org.example.menu;
 
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.models.Guest;
 import org.example.utilities.InputHelper;
 
-@NoArgsConstructor
 @Slf4j
 public class GuestMenu {
+
+    private GuestMenu() {}
 
     private static final String MSG_ADD_GUEST = "--- Добавление нового гостя ---";
     private static final String PROMPT_FULL_NAME = "ФИО: ";

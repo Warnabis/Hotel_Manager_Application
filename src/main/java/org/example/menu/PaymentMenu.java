@@ -1,15 +1,15 @@
 package org.example.menu;
 
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.models.Payment;
 import org.example.utilities.InputHelper;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-@NoArgsConstructor
 @Slf4j
 public class PaymentMenu {
+
+    private PaymentMenu() {}
 
     public static Payment createPayment() {
         log.info("\n--- Добавление нового платежа ---");

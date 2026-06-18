@@ -1,14 +1,14 @@
 package org.example.menu;
 
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.models.Position;
 import org.example.utilities.InputHelper;
 import java.math.BigDecimal;
 
-@NoArgsConstructor
 @Slf4j
 public class PositionMenu {
+
+    private PositionMenu() {}
 
     public static Position createPosition() {
         log.info("\n--- Добавление новой должности ---");

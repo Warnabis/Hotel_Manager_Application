@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.dao.BaseDAO;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Scanner;
 
 @Slf4j
 public class CrudUtils {
@@ -15,8 +14,6 @@ public class CrudUtils {
     private static final String MSG_UPDATED = "Данные обновлены!";
     private static final String MSG_DELETED = " удален!";
     private static final String MSG_DELETE_CANCELLED = "Удаление отменено.";
-
-    private static final Scanner scanner = new Scanner(System.in);
 
     public static <T> void createEntity(BaseDAO<T> dao, String entityName, Creator<T> creator) throws SQLException {
         T entity = creator.create();

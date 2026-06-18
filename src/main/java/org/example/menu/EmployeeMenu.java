@@ -1,13 +1,13 @@
 package org.example.menu;
 
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.models.Employee;
 import org.example.utilities.InputHelper;
 
-@NoArgsConstructor
 @Slf4j
 public class EmployeeMenu {
+
+    private EmployeeMenu() {}
 
     public static Employee createEmployee() {
         log.info("\n--- Добавление нового сотрудника ---");

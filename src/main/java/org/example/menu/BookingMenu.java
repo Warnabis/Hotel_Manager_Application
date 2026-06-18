@@ -1,15 +1,15 @@
 package org.example.menu;
 
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.models.Booking;
 import org.example.utilities.InputHelper;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-@NoArgsConstructor
 @Slf4j
 public class BookingMenu {
+
+    private BookingMenu() {}
 
     public static Booking createBooking() {
         log.info("\n--- Добавление нового бронирования ---");

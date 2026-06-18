@@ -1,6 +1,5 @@
 package org.example.menu;
 
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.dao.ServicePaymentDAO;
 import org.example.models.ServicePayment;
@@ -10,9 +9,10 @@ import org.example.utilities.InputHelper;
 import java.sql.SQLException;
 import java.util.List;
 
-@NoArgsConstructor
 @Slf4j
 public class ServicePaymentMenu {
+
+    private ServicePaymentMenu() {}
 
     private static final String MSG_RELATION_EXISTS = "Такая связь уже существует!";
     private static final String MSG_RELATION_CREATED = "Связь создана! ID: ";

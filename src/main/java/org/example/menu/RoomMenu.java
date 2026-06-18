@@ -1,14 +1,14 @@
 package org.example.menu;
 
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.models.Room;
 import org.example.utilities.InputHelper;
 import java.math.BigDecimal;
 
-@NoArgsConstructor
 @Slf4j
 public class RoomMenu {
+
+    private RoomMenu() {}
 
     public static Room createRoom() {
         log.info("\n--- Добавление нового номера ---");
