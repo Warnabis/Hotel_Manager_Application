@@ -15,10 +15,38 @@ public class PositionDAO extends BaseEntityDAO<Position> {
     }
 
     @Override
+    protected String getUpdateSql() {
+        return "UPDATE public.position SET title = ?, salary = ?, responsibilities = ? WHERE id = ?";
+    }
+
+    @Override
+    protected String getFindAllSql() {
+        return "SELECT id, title, salary, responsibilities FROM public.position ORDER BY id";
+    }
+
+    @Override
+    protected String getFindByIdSql() {
+        return "SELECT id, title, salary, responsibilities FROM public.position WHERE id = ?";
+    }
+
+    @Override
+    protected String getDeleteSql() {
+        return "DELETE FROM public.position WHERE id = ?";
+    }
+
+    @Override
     protected void setInsertParameters(PreparedStatement pstmt, Position position) throws SQLException {
         pstmt.setString(1, position.getTitle());
         pstmt.setBigDecimal(2, position.getSalary());
         pstmt.setString(3, position.getResponsibilities());
+    }
+
+    @Override
+    protected void setUpdateParameters(PreparedStatement pstmt, Position position) throws SQLException {
+        pstmt.setString(1, position.getTitle());
+        pstmt.setBigDecimal(2, position.getSalary());
+        pstmt.setString(3, position.getResponsibilities());
+        pstmt.setInt(4, position.getId());
     }
 
     @Override
@@ -39,19 +67,6 @@ public class PositionDAO extends BaseEntityDAO<Position> {
     @Override
     protected int getId(Position entity) {
         return entity.getId();
-    }
-
-    @Override
-    protected String getUpdateSql() {
-        return "UPDATE public.position SET title = ?, salary = ?, responsibilities = ? WHERE id = ?";
-    }
-
-    @Override
-    protected void setUpdateParameters(PreparedStatement pstmt, Position position) throws SQLException {
-        pstmt.setString(1, position.getTitle());
-        pstmt.setBigDecimal(2, position.getSalary());
-        pstmt.setString(3, position.getResponsibilities());
-        pstmt.setInt(4, position.getId());
     }
 
     @Override

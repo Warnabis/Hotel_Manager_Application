@@ -15,11 +15,40 @@ public class EmployeeDAO extends BaseEntityDAO<Employee> {
     }
 
     @Override
+    protected String getUpdateSql() {
+        return "UPDATE public.employee SET full_name = ?, phone_number = ?, experience = ?, schedule = ? WHERE id = ?";
+    }
+
+    @Override
+    protected String getFindAllSql() {
+        return "SELECT id, full_name, phone_number, experience, schedule FROM public.employee ORDER BY id";
+    }
+
+    @Override
+    protected String getFindByIdSql() {
+        return "SELECT id, full_name, phone_number, experience, schedule FROM public.employee WHERE id = ?";
+    }
+
+    @Override
+    protected String getDeleteSql() {
+        return "DELETE FROM public.employee WHERE id = ?";
+    }
+
+    @Override
     protected void setInsertParameters(PreparedStatement pstmt, Employee employee) throws SQLException {
         pstmt.setString(1, employee.getFullName());
         pstmt.setString(2, employee.getPhoneNumber());
         pstmt.setString(3, employee.getExperience());
         pstmt.setString(4, employee.getSchedule());
+    }
+
+    @Override
+    protected void setUpdateParameters(PreparedStatement pstmt, Employee employee) throws SQLException {
+        pstmt.setString(1, employee.getFullName());
+        pstmt.setString(2, employee.getPhoneNumber());
+        pstmt.setString(3, employee.getExperience());
+        pstmt.setString(4, employee.getSchedule());
+        pstmt.setInt(5, employee.getId());
     }
 
     @Override
@@ -41,19 +70,5 @@ public class EmployeeDAO extends BaseEntityDAO<Employee> {
     @Override
     protected int getId(Employee entity) {
         return entity.getId();
-    }
-
-    @Override
-    protected String getUpdateSql() {
-        return "UPDATE public.employee SET full_name = ?, phone_number = ?, experience = ?, schedule = ? WHERE id = ?";
-    }
-
-    @Override
-    protected void setUpdateParameters(PreparedStatement pstmt, Employee employee) throws SQLException {
-        pstmt.setString(1, employee.getFullName());
-        pstmt.setString(2, employee.getPhoneNumber());
-        pstmt.setString(3, employee.getExperience());
-        pstmt.setString(4, employee.getSchedule());
-        pstmt.setInt(5, employee.getId());
     }
 }

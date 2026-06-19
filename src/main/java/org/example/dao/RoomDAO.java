@@ -15,11 +15,40 @@ public class RoomDAO extends BaseEntityDAO<Room> {
     }
 
     @Override
+    protected String getUpdateSql() {
+        return "UPDATE public.room SET floor = ?, status = ?, type = ?, price = ? WHERE id = ?";
+    }
+
+    @Override
+    protected String getFindAllSql() {
+        return "SELECT id, floor, status, type, price FROM public.room ORDER BY id";
+    }
+
+    @Override
+    protected String getFindByIdSql() {
+        return "SELECT id, floor, status, type, price FROM public.room WHERE id = ?";
+    }
+
+    @Override
+    protected String getDeleteSql() {
+        return "DELETE FROM public.room WHERE id = ?";
+    }
+
+    @Override
     protected void setInsertParameters(PreparedStatement pstmt, Room room) throws SQLException {
         pstmt.setInt(1, room.getFloor());
         pstmt.setString(2, room.getStatus());
         pstmt.setString(3, room.getType());
         pstmt.setBigDecimal(4, room.getPrice());
+    }
+
+    @Override
+    protected void setUpdateParameters(PreparedStatement pstmt, Room room) throws SQLException {
+        pstmt.setInt(1, room.getFloor());
+        pstmt.setString(2, room.getStatus());
+        pstmt.setString(3, room.getType());
+        pstmt.setBigDecimal(4, room.getPrice());
+        pstmt.setInt(5, room.getId());
     }
 
     @Override
@@ -41,20 +70,6 @@ public class RoomDAO extends BaseEntityDAO<Room> {
     @Override
     protected int getId(Room entity) {
         return entity.getId();
-    }
-
-    @Override
-    protected String getUpdateSql() {
-        return "UPDATE public.room SET floor = ?, status = ?, type = ?, price = ? WHERE id = ?";
-    }
-
-    @Override
-    protected void setUpdateParameters(PreparedStatement pstmt, Room room) throws SQLException {
-        pstmt.setInt(1, room.getFloor());
-        pstmt.setString(2, room.getStatus());
-        pstmt.setString(3, room.getType());
-        pstmt.setBigDecimal(4, room.getPrice());
-        pstmt.setInt(5, room.getId());
     }
 
     @Override

@@ -15,11 +15,40 @@ public class ServiceDAO extends BaseEntityDAO<Service> {
     }
 
     @Override
+    protected String getUpdateSql() {
+        return "UPDATE public.service SET title = ?, description = ?, price = ?, duration = ? WHERE id = ?";
+    }
+
+    @Override
+    protected String getFindAllSql() {
+        return "SELECT id, title, description, price, duration FROM public.service ORDER BY id";
+    }
+
+    @Override
+    protected String getFindByIdSql() {
+        return "SELECT id, title, description, price, duration FROM public.service WHERE id = ?";
+    }
+
+    @Override
+    protected String getDeleteSql() {
+        return "DELETE FROM public.service WHERE id = ?";
+    }
+
+    @Override
     protected void setInsertParameters(PreparedStatement pstmt, Service service) throws SQLException {
         pstmt.setString(1, service.getTitle());
         pstmt.setString(2, service.getDescription());
         pstmt.setBigDecimal(3, service.getPrice());
         pstmt.setString(4, service.getDuration());
+    }
+
+    @Override
+    protected void setUpdateParameters(PreparedStatement pstmt, Service service) throws SQLException {
+        pstmt.setString(1, service.getTitle());
+        pstmt.setString(2, service.getDescription());
+        pstmt.setBigDecimal(3, service.getPrice());
+        pstmt.setString(4, service.getDuration());
+        pstmt.setInt(5, service.getId());
     }
 
     @Override
@@ -44,31 +73,19 @@ public class ServiceDAO extends BaseEntityDAO<Service> {
     }
 
     @Override
-    protected String getUpdateSql() {
-        return "UPDATE public.service SET title = ?, description = ?, price = ?, duration = ? WHERE id = ?";
-    }
-
-    @Override
-    protected void setUpdateParameters(PreparedStatement pstmt, Service service) throws SQLException {
-        pstmt.setString(1, service.getTitle());
-        pstmt.setString(2, service.getDescription());
-        pstmt.setBigDecimal(3, service.getPrice());
-        pstmt.setString(4, service.getDuration());
-        pstmt.setInt(5, service.getId());
-    }
-
-    private void executeDeleteQuery(String query, int id) throws SQLException {
-        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
-            pstmt.setInt(1, id);
-            pstmt.executeUpdate();
-        }
-    }
-
-    @Override
     public void delete(int id) throws SQLException {
-        executeDeleteQuery("DELETE FROM public.service_employee WHERE service_id = ?", id);
-        executeDeleteQuery("DELETE FROM public.service_guest WHERE service_id = ?", id);
-        executeDeleteQuery("DELETE FROM public.service_payment WHERE service_id = ?", id);
+        String[] deleteQueries = {
+          "DELETE FROM public.service_employee WHERE service_id = ?",
+          "DELETE FROM public.service_guest WHERE service_id = ?",
+          "DELETE FROM public.service_payment WHERE service_id = ?"
+        };
+
+        for (String query : deleteQueries) {
+            try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+                pstmt.setInt(1, id);
+                pstmt.executeUpdate();
+            }
+        }
         super.delete(id);
     }
 }

@@ -15,11 +15,40 @@ public class GuestDAO extends BaseEntityDAO<Guest> {
     }
 
     @Override
+    protected String getUpdateSql() {
+        return "UPDATE public.guest SET full_name = ?, phone_number = ?, email = ?, status = ? WHERE id = ?";
+    }
+
+    @Override
+    protected String getFindAllSql() {
+        return "SELECT id, full_name, phone_number, email, status FROM public.guest ORDER BY id";
+    }
+
+    @Override
+    protected String getFindByIdSql() {
+        return "SELECT id, full_name, phone_number, email, status FROM public.guest WHERE id = ?";
+    }
+
+    @Override
+    protected String getDeleteSql() {
+        return "DELETE FROM public.guest WHERE id = ?";
+    }
+
+    @Override
     protected void setInsertParameters(PreparedStatement pstmt, Guest guest) throws SQLException {
         pstmt.setString(1, guest.getFullName());
         pstmt.setString(2, guest.getPhoneNumber());
         pstmt.setString(3, guest.getEmail());
         pstmt.setString(4, guest.getStatus());
+    }
+
+    @Override
+    protected void setUpdateParameters(PreparedStatement pstmt, Guest guest) throws SQLException {
+        pstmt.setString(1, guest.getFullName());
+        pstmt.setString(2, guest.getPhoneNumber());
+        pstmt.setString(3, guest.getEmail());
+        pstmt.setString(4, guest.getStatus());
+        pstmt.setInt(5, guest.getId());
     }
 
     @Override
@@ -41,19 +70,5 @@ public class GuestDAO extends BaseEntityDAO<Guest> {
     @Override
     protected int getId(Guest entity) {
         return entity.getId();
-    }
-
-    @Override
-    protected String getUpdateSql() {
-        return "UPDATE public.guest SET full_name = ?, phone_number = ?, email = ?, status = ? WHERE id = ?";
-    }
-
-    @Override
-    protected void setUpdateParameters(PreparedStatement pstmt, Guest guest) throws SQLException {
-        pstmt.setString(1, guest.getFullName());
-        pstmt.setString(2, guest.getPhoneNumber());
-        pstmt.setString(3, guest.getEmail());
-        pstmt.setString(4, guest.getStatus());
-        pstmt.setInt(5, guest.getId());
     }
 }

@@ -15,12 +15,42 @@ public class PaymentDAO extends BaseEntityDAO<Payment> {
     }
 
     @Override
+    protected String getUpdateSql() {
+        return "UPDATE public.payment SET status = ?, amount = ?, date = ?, method = ?, guest_id = ? WHERE id = ?";
+    }
+
+    @Override
+    protected String getFindAllSql() {
+        return "SELECT id, status, amount, date, method, guest_id FROM public.payment ORDER BY id";
+    }
+
+    @Override
+    protected String getFindByIdSql() {
+        return "SELECT id, status, amount, date, method, guest_id FROM public.payment WHERE id = ?";
+    }
+
+    @Override
+    protected String getDeleteSql() {
+        return "DELETE FROM public.payment WHERE id = ?";
+    }
+
+    @Override
     protected void setInsertParameters(PreparedStatement pstmt, Payment payment) throws SQLException {
         pstmt.setString(1, payment.getStatus());
         pstmt.setBigDecimal(2, payment.getAmount());
         pstmt.setDate(3, Date.valueOf(payment.getPaymentDate()));
         pstmt.setString(4, payment.getPaymentMethod());
         pstmt.setInt(5, payment.getGuestId());
+    }
+
+    @Override
+    protected void setUpdateParameters(PreparedStatement pstmt, Payment payment) throws SQLException {
+        pstmt.setString(1, payment.getStatus());
+        pstmt.setBigDecimal(2, payment.getAmount());
+        pstmt.setDate(3, Date.valueOf(payment.getPaymentDate()));
+        pstmt.setString(4, payment.getPaymentMethod());
+        pstmt.setInt(5, payment.getGuestId());
+        pstmt.setInt(6, payment.getId());
     }
 
     @Override
@@ -43,20 +73,5 @@ public class PaymentDAO extends BaseEntityDAO<Payment> {
     @Override
     protected int getId(Payment entity) {
         return entity.getId();
-    }
-
-    @Override
-    protected String getUpdateSql() {
-        return "UPDATE public.payment SET status = ?, amount = ?, date = ?, method = ?, guest_id = ? WHERE id = ?";
-    }
-
-    @Override
-    protected void setUpdateParameters(PreparedStatement pstmt, Payment payment) throws SQLException {
-        pstmt.setString(1, payment.getStatus());
-        pstmt.setBigDecimal(2, payment.getAmount());
-        pstmt.setDate(3, Date.valueOf(payment.getPaymentDate()));
-        pstmt.setString(4, payment.getPaymentMethod());
-        pstmt.setInt(5, payment.getGuestId());
-        pstmt.setInt(6, payment.getId());
     }
 }
