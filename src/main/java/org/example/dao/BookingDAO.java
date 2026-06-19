@@ -2,76 +2,111 @@ package org.example.dao;
 
 import org.example.models.Booking;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
-public class BookingDAO extends BaseEntityDAO<Booking> {
+public class BookingDAO implements BaseDAO<Booking> {
+
+    private final Connection connection;
 
     public BookingDAO(Connection connection) {
-        super(connection, "public.booking");
+        this.connection = connection;
     }
 
     @Override
-    protected String getInsertSql() {
-        return "INSERT INTO public.booking (price, duration, check_in, status, guest_id) VALUES (?, ?, ?, ?, ?)";
+    public void create(Booking booking) throws SQLException {
+        String sql = "INSERT INTO public.booking (price, duration, check_in, status, guest_id) VALUES (?, ?, ?, ?, ?)";
+
+        try (PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            pstmt.setBigDecimal(1, booking.getPrice());
+            pstmt.setString(2, booking.getDuration());
+            pstmt.setDate(3, Date.valueOf(booking.getCheckInDate()));
+            pstmt.setString(4, booking.getStatus());
+            pstmt.setInt(5, booking.getGuestId());
+            pstmt.executeUpdate();
+
+            try (ResultSet rs = pstmt.getGeneratedKeys()) {
+                if (rs.next()) {
+                    booking.setId(rs.getInt(1));
+                } else {
+                    String maxSql = "SELECT COALESCE(MAX(id), 0) + 1 FROM public.booking";
+                    try (Statement stmt = connection.createStatement();
+                         ResultSet maxRs = stmt.executeQuery(maxSql)) {
+                        if (maxRs.next()) {
+                            booking.setId(maxRs.getInt(1));
+                        }
+                    }
+                }
+            }
+        }
     }
 
     @Override
-    protected String getUpdateSql() {
-        return "UPDATE public.booking SET price = ?, duration = ?, check_in = ?, status = ?, guest_id = ? WHERE id = ?";
+    public List<Booking> findAll() throws SQLException {
+        List<Booking> bookings = new ArrayList<>();
+        String sql = "SELECT id, price, status, check_in, duration, guest_id FROM public.booking ORDER BY id";
+
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+
+            while (rs.next()) {
+                Booking booking = new Booking();
+                booking.setId(rs.getInt("id"));
+                booking.setPrice(rs.getBigDecimal("price"));
+                booking.setStatus(rs.getString("status"));
+                booking.setCheckInDate(rs.getDate("check_in").toLocalDate());
+                booking.setDuration(rs.getString("duration"));
+                booking.setGuestId(rs.getInt("guest_id"));
+                bookings.add(booking);
+            }
+        }
+        return bookings;
     }
 
     @Override
-    protected String getFindAllSql() {
-        return "SELECT id, price, status, check_in, duration, guest_id FROM public.booking ORDER BY id";
+    public Booking findById(int id) throws SQLException {
+        String sql = "SELECT id, price, status, check_in, duration, guest_id FROM public.booking WHERE id = ?";
+
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, id);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    Booking booking = new Booking();
+                    booking.setId(rs.getInt("id"));
+                    booking.setPrice(rs.getBigDecimal("price"));
+                    booking.setStatus(rs.getString("status"));
+                    booking.setCheckInDate(rs.getDate("check_in").toLocalDate());
+                    booking.setDuration(rs.getString("duration"));
+                    booking.setGuestId(rs.getInt("guest_id"));
+                    return booking;
+                }
+            }
+        }
+        return null;
     }
 
     @Override
-    protected String getFindByIdSql() {
-        return "SELECT id, price, status, check_in, duration, guest_id FROM public.booking WHERE id = ?";
+    public void update(Booking booking) throws SQLException {
+        String sql = "UPDATE public.booking SET price = ?, duration = ?, check_in = ?, status = ?, guest_id = ? WHERE id = ?";
+
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setBigDecimal(1, booking.getPrice());
+            pstmt.setString(2, booking.getDuration());
+            pstmt.setDate(3, Date.valueOf(booking.getCheckInDate()));
+            pstmt.setString(4, booking.getStatus());
+            pstmt.setInt(5, booking.getGuestId());
+            pstmt.setInt(6, booking.getId());
+            pstmt.executeUpdate();
+        }
     }
 
     @Override
-    protected String getDeleteSql() {
-        return "DELETE FROM public.booking WHERE id = ?";
-    }
-
-    @Override
-    protected void setInsertParameters(PreparedStatement pstmt, Booking booking) throws SQLException {
-        pstmt.setBigDecimal(1, booking.getPrice());
-        pstmt.setString(2, booking.getDuration());
-        pstmt.setDate(3, Date.valueOf(booking.getCheckInDate()));
-        pstmt.setString(4, booking.getStatus());
-        pstmt.setInt(5, booking.getGuestId());
-    }
-
-    @Override
-    protected void setUpdateParameters(PreparedStatement pstmt, Booking booking) throws SQLException {
-        pstmt.setBigDecimal(1, booking.getPrice());
-        pstmt.setString(2, booking.getDuration());
-        pstmt.setDate(3, Date.valueOf(booking.getCheckInDate()));
-        pstmt.setString(4, booking.getStatus());
-        pstmt.setInt(5, booking.getGuestId());
-        pstmt.setInt(6, booking.getId());
-    }
-
-    @Override
-    protected Booking mapRow(ResultSet rs) throws SQLException {
-        Booking booking = new Booking();
-        booking.setId(rs.getInt("id"));
-        booking.setPrice(rs.getBigDecimal("price"));
-        booking.setStatus(rs.getString("status"));
-        booking.setCheckInDate(rs.getDate("check_in").toLocalDate());
-        booking.setDuration(rs.getString("duration"));
-        booking.setGuestId(rs.getInt("guest_id"));
-        return booking;
-    }
-
-    @Override
-    protected void setId(Booking entity, int id) {
-        entity.setId(id);
-    }
-
-    @Override
-    protected int getId(Booking entity) {
-        return entity.getId();
+    public void delete(int id) throws SQLException {
+        String sql = "DELETE FROM public.booking WHERE id = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, id);
+            pstmt.executeUpdate();
+        }
     }
 }

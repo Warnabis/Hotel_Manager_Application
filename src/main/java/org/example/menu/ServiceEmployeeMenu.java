@@ -6,16 +6,25 @@ import org.example.models.ServiceEmployee;
 import org.example.models.Employee;
 import org.example.models.Service;
 import org.example.utilities.InputHelper;
-
 import java.sql.SQLException;
 import java.util.List;
-
-import static org.example.menu.MenuConstants.*;
 
 @Slf4j
 public class ServiceEmployeeMenu {
 
     private ServiceEmployeeMenu() {}
+
+    private static final String MSG_RELATION_EXISTS = "Такая связь уже существует!";
+    private static final String MSG_RELATION_CREATED = "Связь создана! ID: ";
+    private static final String MSG_NO_RELATIONS = "Связей не найдено";
+    private static final String MSG_TOTAL = "Всего: ";
+    private static final String MSG_NOT_FOUND = "Связь не найдена!";
+    private static final String MSG_UPDATED = "Связь обновлена!";
+    private static final String MSG_NO_CHANGES = "Изменений не было.";
+    private static final String MSG_DELETED = "Связь удалена!";
+    private static final String MSG_DELETE_CANCELLED = "Удаление отменено.";
+    private static final String MSG_SERVICES_DELETED = "Все связи услуги удалены!";
+    private static final String MSG_EMPLOYEES_DELETED = "Все связи сотрудника удалены!";
 
     public static void create(ServiceEmployeeDAO dao) throws SQLException {
         log.info("\n--- Добавление связи услуга-сотрудник ---");
@@ -107,6 +116,26 @@ public class ServiceEmployeeMenu {
         } else {
             services.forEach(service -> log.info(service.toString()));
             log.info(MSG_TOTAL + services.size());
+        }
+    }
+
+    public static void deleteByServiceId(ServiceEmployeeDAO dao) throws SQLException {
+        int serviceId = InputHelper.readInt("Введите ID услуги: ");
+        if (InputHelper.confirmAction("Удалить все связи услуги")) {
+            dao.deleteByServiceId(serviceId);
+            log.info(MSG_SERVICES_DELETED);
+        } else {
+            log.info(MSG_DELETE_CANCELLED);
+        }
+    }
+
+    public static void deleteByEmployeeId(ServiceEmployeeDAO dao) throws SQLException {
+        int employeeId = InputHelper.readInt("Введите ID сотрудника: ");
+        if (InputHelper.confirmAction("Удалить все связи сотрудника")) {
+            dao.deleteByEmployeeId(employeeId);
+            log.info(MSG_EMPLOYEES_DELETED);
+        } else {
+            log.info(MSG_DELETE_CANCELLED);
         }
     }
 }

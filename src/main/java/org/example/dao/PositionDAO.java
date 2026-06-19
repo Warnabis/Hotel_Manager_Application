@@ -2,71 +2,87 @@ package org.example.dao;
 
 import org.example.models.Position;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
-public class PositionDAO extends BaseEntityDAO<Position> {
+public class PositionDAO implements BaseDAO<Position> {
+
+    private final Connection connection;
 
     public PositionDAO(Connection connection) {
-        super(connection, "public.position");
+        this.connection = connection;
     }
 
     @Override
-    protected String getInsertSql() {
-        return "INSERT INTO public.position (title, salary, responsibilities) VALUES (?, ?, ?)";
+    public void create(Position position) throws SQLException {
+        String sql = "INSERT INTO public.position (title, salary, responsibilities) VALUES (?, ?, ?)";
+
+        try (PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            pstmt.setString(1, position.getTitle());
+            pstmt.setBigDecimal(2, position.getSalary());
+            pstmt.setString(3, position.getResponsibilities());
+            pstmt.executeUpdate();
+
+            try (ResultSet rs = pstmt.getGeneratedKeys()) {
+                if (rs.next()) {
+                    position.setId(rs.getInt(1));
+                }
+            }
+        }
     }
 
     @Override
-    protected String getUpdateSql() {
-        return "UPDATE public.position SET title = ?, salary = ?, responsibilities = ? WHERE id = ?";
+    public List<Position> findAll() throws SQLException {
+        List<Position> positions = new ArrayList<>();
+        String sql = "SELECT id, title, salary, responsibilities FROM public.position ORDER BY id";
+
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+
+            while (rs.next()) {
+                Position position = new Position();
+                position.setId(rs.getInt("id"));
+                position.setTitle(rs.getString("title"));
+                position.setSalary(rs.getBigDecimal("salary"));
+                position.setResponsibilities(rs.getString("responsibilities"));
+                positions.add(position);
+            }
+        }
+        return positions;
     }
 
     @Override
-    protected String getFindAllSql() {
-        return "SELECT id, title, salary, responsibilities FROM public.position ORDER BY id";
+    public Position findById(int id) throws SQLException {
+        String sql = "SELECT id, title, salary, responsibilities FROM public.position WHERE id = ?";
+
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, id);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    Position position = new Position();
+                    position.setId(rs.getInt("id"));
+                    position.setTitle(rs.getString("title"));
+                    position.setSalary(rs.getBigDecimal("salary"));
+                    position.setResponsibilities(rs.getString("responsibilities"));
+                    return position;
+                }
+            }
+        }
+        return null;
     }
 
     @Override
-    protected String getFindByIdSql() {
-        return "SELECT id, title, salary, responsibilities FROM public.position WHERE id = ?";
-    }
+    public void update(Position position) throws SQLException {
+        String sql = "UPDATE public.position SET title = ?, salary = ?, responsibilities = ? WHERE id = ?";
 
-    @Override
-    protected String getDeleteSql() {
-        return "DELETE FROM public.position WHERE id = ?";
-    }
-
-    @Override
-    protected void setInsertParameters(PreparedStatement pstmt, Position position) throws SQLException {
-        pstmt.setString(1, position.getTitle());
-        pstmt.setBigDecimal(2, position.getSalary());
-        pstmt.setString(3, position.getResponsibilities());
-    }
-
-    @Override
-    protected void setUpdateParameters(PreparedStatement pstmt, Position position) throws SQLException {
-        pstmt.setString(1, position.getTitle());
-        pstmt.setBigDecimal(2, position.getSalary());
-        pstmt.setString(3, position.getResponsibilities());
-        pstmt.setInt(4, position.getId());
-    }
-
-    @Override
-    protected Position mapRow(ResultSet rs) throws SQLException {
-        Position position = new Position();
-        position.setId(rs.getInt("id"));
-        position.setTitle(rs.getString("title"));
-        position.setSalary(rs.getBigDecimal("salary"));
-        position.setResponsibilities(rs.getString("responsibilities"));
-        return position;
-    }
-
-    @Override
-    protected void setId(Position entity, int id) {
-        entity.setId(id);
-    }
-
-    @Override
-    protected int getId(Position entity) {
-        return entity.getId();
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, position.getTitle());
+            pstmt.setBigDecimal(2, position.getSalary());
+            pstmt.setString(3, position.getResponsibilities());
+            pstmt.setInt(4, position.getId());
+            pstmt.executeUpdate();
+        }
     }
 
     @Override
@@ -76,6 +92,11 @@ public class PositionDAO extends BaseEntityDAO<Position> {
             pstmt.setInt(1, id);
             pstmt.executeUpdate();
         }
-        super.delete(id);
+
+        String sql = "DELETE FROM public.position WHERE id = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, id);
+            pstmt.executeUpdate();
+        }
     }
 }

@@ -248,6 +248,8 @@ public class Main {
                 case 5 -> EmployeePositionMenu.delete(employeePositionDAO);
                 case 6 -> EmployeePositionMenu.showPositionsByEmployee(employeePositionDAO);
                 case 7 -> EmployeePositionMenu.showEmployeesByPosition(employeePositionDAO);
+                case 8 -> EmployeePositionMenu.deleteByEmployeeId(employeePositionDAO);
+                case 9 -> EmployeePositionMenu.deleteByPositionId(employeePositionDAO);
                 case 0 -> { return; }
                 default -> log.warn(MSG_INVALID_CHOICE);
             }
@@ -266,6 +268,8 @@ public class Main {
                 case 5 -> RoomBookingMenu.delete(roomBookingDAO);
                 case 6 -> RoomBookingMenu.showRoomsByBooking(roomBookingDAO);
                 case 7 -> RoomBookingMenu.showBookingsByRoom(roomBookingDAO);
+                case 8 -> RoomBookingMenu.deleteByRoomId(roomBookingDAO);
+                case 9 -> RoomBookingMenu.deleteByBookingId(roomBookingDAO);
                 case 0 -> { return; }
                 default -> log.warn(MSG_INVALID_CHOICE);
             }
@@ -284,6 +288,8 @@ public class Main {
                 case 5 -> BookingPaymentMenu.delete(bookingPaymentDAO);
                 case 6 -> BookingPaymentMenu.showPaymentsByBooking(bookingPaymentDAO);
                 case 7 -> BookingPaymentMenu.showBookingsByPayment(bookingPaymentDAO);
+                case 8 -> BookingPaymentMenu.deleteByBookingId(bookingPaymentDAO);
+                case 9 -> BookingPaymentMenu.deleteByPaymentId(bookingPaymentDAO);
                 case 0 -> { return; }
                 default -> log.warn(MSG_INVALID_CHOICE);
             }
@@ -302,6 +308,8 @@ public class Main {
                 case 5 -> RoomEmployeeMenu.delete(roomEmployeeDAO);
                 case 6 -> RoomEmployeeMenu.showEmployeesByRoom(roomEmployeeDAO);
                 case 7 -> RoomEmployeeMenu.showRoomsByEmployee(roomEmployeeDAO);
+                case 8 -> RoomEmployeeMenu.deleteByRoomId(roomEmployeeDAO);
+                case 9 -> RoomEmployeeMenu.deleteByEmployeeId(roomEmployeeDAO);
                 case 0 -> { return; }
                 default -> log.warn(MSG_INVALID_CHOICE);
             }
@@ -320,6 +328,8 @@ public class Main {
                 case 5 -> ServiceEmployeeMenu.delete(serviceEmployeeDAO);
                 case 6 -> ServiceEmployeeMenu.showEmployeesByService(serviceEmployeeDAO);
                 case 7 -> ServiceEmployeeMenu.showServicesByEmployee(serviceEmployeeDAO);
+                case 8 -> ServiceEmployeeMenu.deleteByServiceId(serviceEmployeeDAO);
+                case 9 -> ServiceEmployeeMenu.deleteByEmployeeId(serviceEmployeeDAO);
                 case 0 -> { return; }
                 default -> log.warn(MSG_INVALID_CHOICE);
             }
@@ -338,6 +348,8 @@ public class Main {
                 case 5 -> ServiceGuestMenu.delete(serviceGuestDAO);
                 case 6 -> ServiceGuestMenu.showGuestsByService(serviceGuestDAO);
                 case 7 -> ServiceGuestMenu.showServicesByGuest(serviceGuestDAO);
+                case 8 -> ServiceGuestMenu.deleteByServiceId(serviceGuestDAO);
+                case 9 -> ServiceGuestMenu.deleteByGuestId(serviceGuestDAO);
                 case 0 -> { return; }
                 default -> log.warn(MSG_INVALID_CHOICE);
             }
@@ -356,6 +368,8 @@ public class Main {
                 case 5 -> ServicePaymentMenu.delete(servicePaymentDAO);
                 case 6 -> ServicePaymentMenu.showPaymentsByService(servicePaymentDAO);
                 case 7 -> ServicePaymentMenu.showServicesByPayment(servicePaymentDAO);
+                case 8 -> ServicePaymentMenu.deleteByServiceId(servicePaymentDAO);
+                case 9 -> ServicePaymentMenu.deleteByPaymentId(servicePaymentDAO);
                 case 0 -> { return; }
                 default -> log.warn(MSG_INVALID_CHOICE);
             }
@@ -381,6 +395,8 @@ public class Main {
         log.info("5. Удалить связь");
         log.info("6. Показать по правой связи");
         log.info("7. Показать по левой связи");
+        log.info("8. Удалить по правой связи");
+        log.info("9. Удалить по левой связи");
         log.info("0. Назад");
     }
 }

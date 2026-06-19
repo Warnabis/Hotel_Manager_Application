@@ -2,76 +2,104 @@ package org.example.dao;
 
 import org.example.models.Payment;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
-public class PaymentDAO extends BaseEntityDAO<Payment> {
+public class PaymentDAO implements BaseDAO<Payment> {
+
+    private final Connection connection;
 
     public PaymentDAO(Connection connection) {
-        super(connection, "public.payment");
+        this.connection = connection;
     }
 
     @Override
-    protected String getInsertSql() {
-        return "INSERT INTO public.payment (status, amount, date, method, guest_id) VALUES (?, ?, ?, ?, ?)";
+    public void create(Payment payment) throws SQLException {
+        String sql = "INSERT INTO public.payment (status, amount, date, method, guest_id) VALUES (?, ?, ?, ?, ?)";
+
+        try (PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            pstmt.setString(1, payment.getStatus());
+            pstmt.setBigDecimal(2, payment.getAmount());
+            pstmt.setDate(3, Date.valueOf(payment.getPaymentDate()));
+            pstmt.setString(4, payment.getPaymentMethod());
+            pstmt.setInt(5, payment.getGuestId());
+            pstmt.executeUpdate();
+
+            try (ResultSet rs = pstmt.getGeneratedKeys()) {
+                if (rs.next()) {
+                    payment.setId(rs.getInt(1));
+                }
+            }
+        }
     }
 
     @Override
-    protected String getUpdateSql() {
-        return "UPDATE public.payment SET status = ?, amount = ?, date = ?, method = ?, guest_id = ? WHERE id = ?";
+    public List<Payment> findAll() throws SQLException {
+        List<Payment> payments = new ArrayList<>();
+        String sql = "SELECT id, status, amount, date, method, guest_id FROM public.payment ORDER BY id";
+
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+
+            while (rs.next()) {
+                Payment payment = new Payment();
+                payment.setId(rs.getInt("id"));
+                payment.setStatus(rs.getString("status"));
+                payment.setAmount(rs.getBigDecimal("amount"));
+                payment.setPaymentDate(rs.getDate("date").toLocalDate());
+                payment.setPaymentMethod(rs.getString("method"));
+                payment.setGuestId(rs.getInt("guest_id"));
+                payments.add(payment);
+            }
+        }
+        return payments;
     }
 
     @Override
-    protected String getFindAllSql() {
-        return "SELECT id, status, amount, date, method, guest_id FROM public.payment ORDER BY id";
+    public Payment findById(int id) throws SQLException {
+        String sql = "SELECT id, status, amount, date, method, guest_id FROM public.payment WHERE id = ?";
+
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, id);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    Payment payment = new Payment();
+                    payment.setId(rs.getInt("id"));
+                    payment.setStatus(rs.getString("status"));
+                    payment.setAmount(rs.getBigDecimal("amount"));
+                    payment.setPaymentDate(rs.getDate("date").toLocalDate());
+                    payment.setPaymentMethod(rs.getString("method"));
+                    payment.setGuestId(rs.getInt("guest_id"));
+                    return payment;
+                }
+            }
+        }
+        return null;
     }
 
     @Override
-    protected String getFindByIdSql() {
-        return "SELECT id, status, amount, date, method, guest_id FROM public.payment WHERE id = ?";
+    public void update(Payment payment) throws SQLException {
+        String sql = "UPDATE public.payment SET status = ?, amount = ?, date = ?, method = ?, guest_id = ? WHERE id = ?";
+
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, payment.getStatus());
+            pstmt.setBigDecimal(2, payment.getAmount());
+            pstmt.setDate(3, Date.valueOf(payment.getPaymentDate()));
+            pstmt.setString(4, payment.getPaymentMethod());
+            pstmt.setInt(5, payment.getGuestId());
+            pstmt.setInt(6, payment.getId());
+            pstmt.executeUpdate();
+        }
     }
 
     @Override
-    protected String getDeleteSql() {
-        return "DELETE FROM public.payment WHERE id = ?";
-    }
+    public void delete(int id) throws SQLException {
+        String sql = "DELETE FROM public.payment WHERE id = ?";
 
-    @Override
-    protected void setInsertParameters(PreparedStatement pstmt, Payment payment) throws SQLException {
-        pstmt.setString(1, payment.getStatus());
-        pstmt.setBigDecimal(2, payment.getAmount());
-        pstmt.setDate(3, Date.valueOf(payment.getPaymentDate()));
-        pstmt.setString(4, payment.getPaymentMethod());
-        pstmt.setInt(5, payment.getGuestId());
-    }
-
-    @Override
-    protected void setUpdateParameters(PreparedStatement pstmt, Payment payment) throws SQLException {
-        pstmt.setString(1, payment.getStatus());
-        pstmt.setBigDecimal(2, payment.getAmount());
-        pstmt.setDate(3, Date.valueOf(payment.getPaymentDate()));
-        pstmt.setString(4, payment.getPaymentMethod());
-        pstmt.setInt(5, payment.getGuestId());
-        pstmt.setInt(6, payment.getId());
-    }
-
-    @Override
-    protected Payment mapRow(ResultSet rs) throws SQLException {
-        Payment payment = new Payment();
-        payment.setId(rs.getInt("id"));
-        payment.setStatus(rs.getString("status"));
-        payment.setAmount(rs.getBigDecimal("amount"));
-        payment.setPaymentDate(rs.getDate("date").toLocalDate());
-        payment.setPaymentMethod(rs.getString("method"));
-        payment.setGuestId(rs.getInt("guest_id"));
-        return payment;
-    }
-
-    @Override
-    protected void setId(Payment entity, int id) {
-        entity.setId(id);
-    }
-
-    @Override
-    protected int getId(Payment entity) {
-        return entity.getId();
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, id);
+            pstmt.executeUpdate();
+        }
     }
 }

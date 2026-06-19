@@ -6,16 +6,25 @@ import org.example.models.RoomBooking;
 import org.example.models.Room;
 import org.example.models.Booking;
 import org.example.utilities.InputHelper;
-
 import java.sql.SQLException;
 import java.util.List;
-
-import static org.example.menu.MenuConstants.*;
 
 @Slf4j
 public class RoomBookingMenu {
 
     private RoomBookingMenu() {}
+
+    private static final String MSG_RELATION_EXISTS = "Такая связь уже существует!";
+    private static final String MSG_RELATION_CREATED = "Связь создана! ID: ";
+    private static final String MSG_NO_RELATIONS = "Связей не найдено";
+    private static final String MSG_TOTAL = "Всего: ";
+    private static final String MSG_NOT_FOUND = "Связь не найдена!";
+    private static final String MSG_UPDATED = "Связь обновлена!";
+    private static final String MSG_NO_CHANGES = "Изменений не было.";
+    private static final String MSG_DELETED = "Связь удалена!";
+    private static final String MSG_DELETE_CANCELLED = "Удаление отменено.";
+    private static final String MSG_ROOMS_DELETED = "Все связи номера удалены!";
+    private static final String MSG_BOOKINGS_DELETED = "Все связи бронирования удалены!";
 
     public static void create(RoomBookingDAO dao) throws SQLException {
         log.info("\n--- Добавление связи номер-бронирование ---");
@@ -107,6 +116,26 @@ public class RoomBookingMenu {
         } else {
             bookings.forEach(booking -> log.info(booking.toString()));
             log.info(MSG_TOTAL + bookings.size());
+        }
+    }
+
+    public static void deleteByRoomId(RoomBookingDAO dao) throws SQLException {
+        int roomId = InputHelper.readInt("Введите ID номера: ");
+        if (InputHelper.confirmAction("Удалить все связи номера")) {
+            dao.deleteByRoomId(roomId);
+            log.info(MSG_ROOMS_DELETED);
+        } else {
+            log.info(MSG_DELETE_CANCELLED);
+        }
+    }
+
+    public static void deleteByBookingId(RoomBookingDAO dao) throws SQLException {
+        int bookingId = InputHelper.readInt("Введите ID бронирования: ");
+        if (InputHelper.confirmAction("Удалить все связи бронирования")) {
+            dao.deleteByBookingId(bookingId);
+            log.info(MSG_BOOKINGS_DELETED);
+        } else {
+            log.info(MSG_DELETE_CANCELLED);
         }
     }
 }

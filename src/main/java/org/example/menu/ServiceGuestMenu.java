@@ -6,16 +6,25 @@ import org.example.models.ServiceGuest;
 import org.example.models.Guest;
 import org.example.models.Service;
 import org.example.utilities.InputHelper;
-
 import java.sql.SQLException;
 import java.util.List;
-
-import static org.example.menu.MenuConstants.*;
 
 @Slf4j
 public class ServiceGuestMenu {
 
     private ServiceGuestMenu() {}
+
+    private static final String MSG_RELATION_EXISTS = "Такая связь уже существует!";
+    private static final String MSG_RELATION_CREATED = "Связь создана! ID: ";
+    private static final String MSG_NO_RELATIONS = "Связей не найдено";
+    private static final String MSG_TOTAL = "Всего: ";
+    private static final String MSG_NOT_FOUND = "Связь не найдена!";
+    private static final String MSG_UPDATED = "Связь обновлена!";
+    private static final String MSG_NO_CHANGES = "Изменений не было.";
+    private static final String MSG_DELETED = "Связь удалена!";
+    private static final String MSG_DELETE_CANCELLED = "Удаление отменено.";
+    private static final String MSG_SERVICES_DELETED = "Все связи услуги удалены!";
+    private static final String MSG_GUESTS_DELETED = "Все связи гостя удалены!";
 
     public static void create(ServiceGuestDAO dao) throws SQLException {
         log.info("\n--- Добавление связи услуга-гость ---");
@@ -107,6 +116,26 @@ public class ServiceGuestMenu {
         } else {
             services.forEach(service -> log.info(service.toString()));
             log.info(MSG_TOTAL + services.size());
+        }
+    }
+
+    public static void deleteByServiceId(ServiceGuestDAO dao) throws SQLException {
+        int serviceId = InputHelper.readInt("Введите ID услуги: ");
+        if (InputHelper.confirmAction("Удалить все связи услуги")) {
+            dao.deleteByServiceId(serviceId);
+            log.info(MSG_SERVICES_DELETED);
+        } else {
+            log.info(MSG_DELETE_CANCELLED);
+        }
+    }
+
+    public static void deleteByGuestId(ServiceGuestDAO dao) throws SQLException {
+        int guestId = InputHelper.readInt("Введите ID гостя: ");
+        if (InputHelper.confirmAction("Удалить все связи гостя")) {
+            dao.deleteByGuestId(guestId);
+            log.info(MSG_GUESTS_DELETED);
+        } else {
+            log.info(MSG_DELETE_CANCELLED);
         }
     }
 }
