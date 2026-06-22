@@ -7,10 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class Booking {
-    private int id;
+public class Booking extends EntityWithId {
     private BigDecimal price;
     private String status;
     private LocalDate checkInDate;

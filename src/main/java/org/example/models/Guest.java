@@ -2,9 +2,7 @@ package org.example.models;
 
 @lombok.Data
 @lombok.NoArgsConstructor
-@lombok.AllArgsConstructor
-public class Guest {
-    private int id;
+public class Guest extends EntityWithId {
     private String fullName;
     private String phoneNumber;
     private String email;

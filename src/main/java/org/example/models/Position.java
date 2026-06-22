@@ -6,9 +6,7 @@ import java.math.BigDecimal;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
-public class Position {
-    private int id;
+public class Position extends EntityWithId {
     private String title;
     private BigDecimal salary;
     private String responsibilities;

@@ -5,9 +5,7 @@ import lombok.*;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
-public class Employee {
-    private int id;
+public class Employee extends EntityWithId {
     private String fullName;
     private String experience;
     private String schedule;

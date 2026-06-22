@@ -7,9 +7,7 @@ import java.math.BigDecimal;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
-public class Service {
-    private int id;
+public class Service extends EntityWithId {
     private String title;
     private String description;
     private BigDecimal price;

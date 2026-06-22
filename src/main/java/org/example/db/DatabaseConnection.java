@@ -1,17 +1,36 @@
 package org.example.db;
 
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Properties;
 
 public class DatabaseConnection {
 
+    private static final Properties props = new Properties();
+
+    static {
+        try (InputStream input = DatabaseConnection.class.getClassLoader()
+          .getResourceAsStream("dbconfig.properties")) {
+            if (input == null) {
+                throw new RuntimeException("Файл dbconfig.properties не найден в classpath");
+            }
+            props.load(input);
+
+            Class.forName(props.getProperty("db.driver"));
+        } catch (Exception e) {
+            throw new RuntimeException("Ошибка загрузки конфигурации БД", e);
+        }
+    }
+
     private DatabaseConnection() {}
-    public static final String URL = System.getenv("POSTGRES_URL");
-    public static final String USER = System.getenv("POSTGRES_USER");
-    public static final String PASSWORD = System.getenv("POSTGRES_PASSWORD");
 
     public static Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(URL, USER, PASSWORD);
+        return DriverManager.getConnection(
+          props.getProperty("db.url"),
+          props.getProperty("db.username"),
+          props.getProperty("db.password")
+        );
     }
 }

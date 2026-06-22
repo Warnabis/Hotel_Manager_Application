@@ -6,9 +6,7 @@ import java.time.LocalDate;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
-public class Payment {
-    private int id;
+public class Payment extends EntityWithId {
     private String status;
     private BigDecimal amount;
     private LocalDate paymentDate;

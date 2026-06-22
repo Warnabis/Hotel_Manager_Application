@@ -7,9 +7,7 @@ import java.math.BigDecimal;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
-public class Room {
-    private int id;
+public class Room extends EntityWithId {
     private int floor;
     private String type;
     private String status;
