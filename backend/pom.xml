@@ -9,7 +9,7 @@
 		<relativePath/>
 	</parent>
 	<groupId>com.warnabis</groupId>
-	<artifactId>Hotel_SpringBoot_Application</artifactId>
+	<artifactId>hotel_springboot_application</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Hotel SpringBoot Application</name>
 	<description>Hotel Manager Application</description>
