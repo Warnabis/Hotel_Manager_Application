@@ -1,0 +1,45 @@
+package com.warnabis.Hotel_SpringBoot_Application.mapper;
+
+import com.warnabis.Hotel_SpringBoot_Application.dto.request.GuestRequestDto;
+import com.warnabis.Hotel_SpringBoot_Application.dto.response.GuestResponseDto;
+import com.warnabis.Hotel_SpringBoot_Application.model.Guest;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
+import java.util.stream.Collectors;
+
+@Component
+@RequiredArgsConstructor
+public class GuestMapper {
+
+    public Guest toEntity(GuestRequestDto dto) {
+        if (dto == null) return null;
+        Guest guest = new Guest();
+        guest.setFullName(dto.getFullName());
+        guest.setPhoneNumber(dto.getPhoneNumber());
+        guest.setEmail(dto.getEmail());
+        guest.setStatus(dto.getStatus());
+        return guest;
+    }
+
+    public GuestResponseDto toResponseDto(Guest guest) {
+        if (guest == null) return null;
+        GuestResponseDto dto = new GuestResponseDto();
+        dto.setId(guest.getId());
+        dto.setFullName(guest.getFullName());
+        dto.setPhoneNumber(guest.getPhoneNumber());
+        dto.setEmail(guest.getEmail());
+        dto.setStatus(guest.getStatus());
+        if (guest.getServices() != null) {
+            dto.setServiceIds(guest.getServices().stream().map(s -> s.getId()).collect(Collectors.toList()));
+        }
+        return dto;
+    }
+
+    public void updateEntity(GuestRequestDto dto, Guest guest) {
+        if (dto == null || guest == null) return;
+        if (dto.getFullName() != null) guest.setFullName(dto.getFullName());
+        if (dto.getPhoneNumber() != null) guest.setPhoneNumber(dto.getPhoneNumber());
+        if (dto.getEmail() != null) guest.setEmail(dto.getEmail());
+        if (dto.getStatus() != null) guest.setStatus(dto.getStatus());
+    }
+}
