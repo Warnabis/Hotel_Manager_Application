@@ -2,13 +2,14 @@ package com.warnabis.hotel_springboot_application.mapper;
 
 import com.warnabis.hotel_springboot_application.dto.request.ServiceRequestDto;
 import com.warnabis.hotel_springboot_application.dto.response.ServiceResponseDto;
+import com.warnabis.hotel_springboot_application.model.Employee;
+import com.warnabis.hotel_springboot_application.model.Guest;
 import com.warnabis.hotel_springboot_application.model.Service;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+
 import java.util.stream.Collectors;
 
 @Component
-@RequiredArgsConstructor
 public class ServiceMapper {
 
     public Service toEntity(ServiceRequestDto dto) {
@@ -29,11 +30,16 @@ public class ServiceMapper {
         dto.setDescription(service.getDescription());
         dto.setPrice(service.getPrice());
         dto.setDuration(service.getDuration());
+
         if (service.getGuests() != null) {
-            dto.setGuestIds(service.getGuests().stream().map(g -> g.getId()).collect(Collectors.toList()));
+            dto.setGuestIds(service.getGuests().stream()
+              .map(Guest::getId)
+              .collect(Collectors.toList()));
         }
         if (service.getEmployees() != null) {
-            dto.setEmployeeIds(service.getEmployees().stream().map(e -> e.getId()).collect(Collectors.toList()));
+            dto.setEmployeeIds(service.getEmployees().stream()
+              .map(Employee::getId)
+              .collect(Collectors.toList()));
         }
         return dto;
     }
@@ -44,6 +50,5 @@ public class ServiceMapper {
         if (dto.getDescription() != null) service.setDescription(dto.getDescription());
         if (dto.getPrice() != null) service.setPrice(dto.getPrice());
         if (dto.getDuration() != null) service.setDuration(dto.getDuration());
-
     }
 }

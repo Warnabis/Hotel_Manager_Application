@@ -3,12 +3,11 @@ package com.warnabis.hotel_springboot_application.mapper;
 import com.warnabis.hotel_springboot_application.dto.request.GuestRequestDto;
 import com.warnabis.hotel_springboot_application.dto.response.GuestResponseDto;
 import com.warnabis.hotel_springboot_application.model.Guest;
-import lombok.RequiredArgsConstructor;
+import com.warnabis.hotel_springboot_application.model.Service;
 import org.springframework.stereotype.Component;
 import java.util.stream.Collectors;
 
 @Component
-@RequiredArgsConstructor
 public class GuestMapper {
 
     public Guest toEntity(GuestRequestDto dto) {
@@ -29,8 +28,11 @@ public class GuestMapper {
         dto.setPhoneNumber(guest.getPhoneNumber());
         dto.setEmail(guest.getEmail());
         dto.setStatus(guest.getStatus());
+
         if (guest.getServices() != null) {
-            dto.setServiceIds(guest.getServices().stream().map(s -> s.getId()).collect(Collectors.toList()));
+            dto.setServiceIds(guest.getServices().stream()
+              .map(Service::getId)
+              .collect(Collectors.toList()));
         }
         return dto;
     }

@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("/api/service")
+@RequestMapping("/service")
 @RequiredArgsConstructor
 public class ServiceController {
 

@@ -3,13 +3,12 @@ package com.warnabis.hotel_springboot_application.mapper;
 import com.warnabis.hotel_springboot_application.dto.request.RoomRequestDto;
 import com.warnabis.hotel_springboot_application.dto.response.RoomResponseDto;
 import com.warnabis.hotel_springboot_application.model.Room;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-@RequiredArgsConstructor
 public class RoomMapper {
 
     public Room toEntity(RoomRequestDto dto) {
@@ -35,7 +34,9 @@ public class RoomMapper {
 
     public List<RoomResponseDto> toResponseDtoList(List<Room> rooms) {
         if (rooms == null) return List.of();
-        return rooms.stream().map(this::toResponseDto).collect(Collectors.toList());
+        return rooms.stream()
+          .map(this::toResponseDto)
+          .collect(Collectors.toList());
     }
 
     public void updateEntity(RoomRequestDto dto, Room room) {

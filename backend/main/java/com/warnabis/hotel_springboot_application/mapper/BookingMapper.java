@@ -6,7 +6,6 @@ import com.warnabis.hotel_springboot_application.model.Booking;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-
 @Component
 @RequiredArgsConstructor
 public class BookingMapper {
@@ -22,7 +21,6 @@ public class BookingMapper {
         booking.setStatus(dto.getStatus());
         booking.setCheckInDate(dto.getCheckInDate());
         booking.setDuration(dto.getDuration());
-
         return booking;
     }
 
@@ -38,15 +36,12 @@ public class BookingMapper {
         if (booking.getGuest() != null) {
             dto.setGuest(guestMapper.toResponseDto(booking.getGuest()));
         }
-
         if (booking.getRooms() != null) {
             dto.setRooms(roomMapper.toResponseDtoList(booking.getRooms()));
         }
-
         if (booking.getPayments() != null) {
             dto.setPayments(paymentMapper.toResponseDtoList(booking.getPayments()));
         }
-
         return dto;
     }
 
@@ -56,6 +51,5 @@ public class BookingMapper {
         if (dto.getStatus() != null) booking.setStatus(dto.getStatus());
         if (dto.getCheckInDate() != null) booking.setCheckInDate(dto.getCheckInDate());
         if (dto.getDuration() != null) booking.setDuration(dto.getDuration());
-
     }
 }

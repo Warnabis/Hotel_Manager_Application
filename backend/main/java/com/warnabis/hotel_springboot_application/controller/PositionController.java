@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("/api/position")
+@RequestMapping("/position")
 @RequiredArgsConstructor
 public class PositionController {
 

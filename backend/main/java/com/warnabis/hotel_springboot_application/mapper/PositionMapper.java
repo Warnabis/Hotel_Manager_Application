@@ -1,14 +1,14 @@
+
 package com.warnabis.hotel_springboot_application.mapper;
 
 import com.warnabis.hotel_springboot_application.dto.request.PositionRequestDto;
 import com.warnabis.hotel_springboot_application.dto.response.PositionResponseDto;
+import com.warnabis.hotel_springboot_application.model.Employee;
 import com.warnabis.hotel_springboot_application.model.Position;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import java.util.stream.Collectors;
 
 @Component
-@RequiredArgsConstructor
 public class PositionMapper {
 
     public Position toEntity(PositionRequestDto dto) {
@@ -27,8 +27,11 @@ public class PositionMapper {
         dto.setTitle(position.getTitle());
         dto.setSalary(position.getSalary());
         dto.setResponsibilities(position.getResponsibilities());
+
         if (position.getEmployees() != null) {
-            dto.setEmployeeIds(position.getEmployees().stream().map(e -> e.getId()).collect(Collectors.toList()));
+            dto.setEmployeeIds(position.getEmployees().stream()
+              .map(Employee::getId)
+              .collect(Collectors.toList()));
         }
         return dto;
     }
@@ -38,6 +41,5 @@ public class PositionMapper {
         if (dto.getTitle() != null) position.setTitle(dto.getTitle());
         if (dto.getSalary() != null) position.setSalary(dto.getSalary());
         if (dto.getResponsibilities() != null) position.setResponsibilities(dto.getResponsibilities());
-
     }
 }

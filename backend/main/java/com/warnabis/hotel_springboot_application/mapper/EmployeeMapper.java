@@ -3,12 +3,14 @@ package com.warnabis.hotel_springboot_application.mapper;
 import com.warnabis.hotel_springboot_application.dto.request.EmployeeRequestDto;
 import com.warnabis.hotel_springboot_application.dto.response.EmployeeResponseDto;
 import com.warnabis.hotel_springboot_application.model.Employee;
-import lombok.RequiredArgsConstructor;
+import com.warnabis.hotel_springboot_application.model.Position;
+import com.warnabis.hotel_springboot_application.model.Room;
+import com.warnabis.hotel_springboot_application.model.Service;
 import org.springframework.stereotype.Component;
+
 import java.util.stream.Collectors;
 
 @Component
-@RequiredArgsConstructor
 public class EmployeeMapper {
 
     public Employee toEntity(EmployeeRequestDto dto) {
@@ -29,14 +31,21 @@ public class EmployeeMapper {
         dto.setExperience(employee.getExperience());
         dto.setSchedule(employee.getSchedule());
         dto.setPhoneNumber(employee.getPhoneNumber());
+
         if (employee.getPositions() != null) {
-            dto.setPositionIds(employee.getPositions().stream().map(p -> p.getId()).collect(Collectors.toList()));
+            dto.setPositionIds(employee.getPositions().stream()
+              .map(Position::getId)
+              .collect(Collectors.toList()));
         }
         if (employee.getRooms() != null) {
-            dto.setRoomIds(employee.getRooms().stream().map(r -> r.getId()).collect(Collectors.toList()));
+            dto.setRoomIds(employee.getRooms().stream()
+              .map(Room::getId)
+              .collect(Collectors.toList()));
         }
         if (employee.getServices() != null) {
-            dto.setServiceIds(employee.getServices().stream().map(s -> s.getId()).collect(Collectors.toList()));
+            dto.setServiceIds(employee.getServices().stream()
+              .map(Service::getId)
+              .collect(Collectors.toList()));
         }
         return dto;
     }
