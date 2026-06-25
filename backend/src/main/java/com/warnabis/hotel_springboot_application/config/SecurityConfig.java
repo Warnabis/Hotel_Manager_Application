@@ -15,6 +15,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 @Configuration
 @EnableWebSecurity
@@ -24,37 +25,51 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
+    private static final String ROLE_GUEST = "GUEST";
+    private static final String ROLE_ADMIN = "ADMIN";
+    
+    private static final String AUTH_PATH = "/auth";
+    private static final String ROOM_PATH = "/room";
+    private static final String SERVICE_PATH = "/service";
+    private static final String GUEST_PATH = "/guest";
+    private static final String BOOKING_PATH = "/booking";
+    private static final String PAYMENT_PATH = "/payment";
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
           .csrf(csrf -> csrf.disable())
           .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
           .authorizeHttpRequests(auth -> auth
-            .requestMatchers(HttpMethod.POST, "/auth/register", "/auth/login", "/auth/admin/login").permitAll()
-            .requestMatchers(HttpMethod.GET, "/auth/me").hasRole("GUEST")
-            .requestMatchers(HttpMethod.DELETE, "/auth/account").hasRole("GUEST")
-            .requestMatchers(HttpMethod.POST, "/auth/change-password").hasRole("GUEST")
-            .requestMatchers(HttpMethod.GET, "/room", "/room/**").permitAll()
-            .requestMatchers(HttpMethod.GET, "/service", "/service/**").permitAll()
-            .requestMatchers(HttpMethod.GET, "/guest/*").hasAnyRole("GUEST", "ADMIN")
-            .requestMatchers(HttpMethod.PUT, "/guest/*").hasAnyRole("GUEST", "ADMIN")
-            .requestMatchers(HttpMethod.DELETE, "/guest/*").hasAnyRole("GUEST", "ADMIN")
-            .requestMatchers(HttpMethod.POST, "/guest").hasRole("ADMIN")
-            .requestMatchers(HttpMethod.GET, "/guest").hasRole("ADMIN")
-            .requestMatchers(HttpMethod.POST, "/booking").hasAnyRole("GUEST", "ADMIN")
-            .requestMatchers(HttpMethod.GET, "/booking", "/booking/**").hasAnyRole("GUEST", "ADMIN")
-            .requestMatchers(HttpMethod.PUT, "/booking/**").hasAnyRole("GUEST", "ADMIN")
-            .requestMatchers(HttpMethod.DELETE, "/booking/**").hasAnyRole("GUEST", "ADMIN")
-            .requestMatchers(HttpMethod.POST, "/payment").hasAnyRole("GUEST", "ADMIN")
-            .requestMatchers(HttpMethod.PUT, "/payment/*").hasAnyRole("GUEST", "ADMIN")
-            .requestMatchers(HttpMethod.DELETE, "/payment/*").hasAnyRole("GUEST", "ADMIN")
-            .anyRequest().hasRole("ADMIN")
+            .requestMatchers(HttpMethod.POST, AUTH_PATH + "/register", AUTH_PATH + "/login", AUTH_PATH + "/admin/login").permitAll()
+            .requestMatchers(HttpMethod.GET, AUTH_PATH + "/me").hasRole(ROLE_GUEST)
+            .requestMatchers(HttpMethod.DELETE, AUTH_PATH + "/account").hasRole(ROLE_GUEST)
+            .requestMatchers(HttpMethod.POST, AUTH_PATH + "/change-password").hasRole(ROLE_GUEST)
+            .requestMatchers(HttpMethod.GET, ROOM_PATH, ROOM_PATH + "/**").permitAll()
+            .requestMatchers(HttpMethod.GET, SERVICE_PATH, SERVICE_PATH + "/**").permitAll()
+            .requestMatchers(HttpMethod.GET, GUEST_PATH + "/*").hasAnyRole(ROLE_GUEST, ROLE_ADMIN)
+            .requestMatchers(HttpMethod.PUT, GUEST_PATH + "/*").hasAnyRole(ROLE_GUEST, ROLE_ADMIN)
+            .requestMatchers(HttpMethod.DELETE, GUEST_PATH + "/*").hasAnyRole(ROLE_GUEST, ROLE_ADMIN)
+            .requestMatchers(HttpMethod.POST, GUEST_PATH).hasRole(ROLE_ADMIN)
+            .requestMatchers(HttpMethod.GET, GUEST_PATH).hasRole(ROLE_ADMIN)
+            .requestMatchers(HttpMethod.POST, BOOKING_PATH).hasAnyRole(ROLE_GUEST, ROLE_ADMIN)
+            .requestMatchers(HttpMethod.GET, BOOKING_PATH, BOOKING_PATH + "/**").hasAnyRole(ROLE_GUEST, ROLE_ADMIN)
+            .requestMatchers(HttpMethod.PUT, BOOKING_PATH + "/**").hasAnyRole(ROLE_GUEST, ROLE_ADMIN)
+            .requestMatchers(HttpMethod.DELETE, BOOKING_PATH + "/**").hasAnyRole(ROLE_GUEST, ROLE_ADMIN)
+            .requestMatchers(HttpMethod.POST, PAYMENT_PATH).hasAnyRole(ROLE_GUEST, ROLE_ADMIN)
+            .requestMatchers(HttpMethod.PUT, PAYMENT_PATH + "/*").hasAnyRole(ROLE_GUEST, ROLE_ADMIN)
+            .requestMatchers(HttpMethod.DELETE, PAYMENT_PATH + "/*").hasAnyRole(ROLE_GUEST, ROLE_ADMIN)
+            .anyRequest().hasRole(ROLE_ADMIN)
           )
           .exceptionHandling(ex -> ex
             .authenticationEntryPoint((request, response, authException) -> {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.setContentType("application/json");
-                response.getWriter().write("{\"message\":\"Требуется авторизация\"}");
+                try {
+                    response.getWriter().write("{\"message\":\"Требуется авторизация\"}");
+                } catch (IOException e) {
+                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                }
             })
           )
           .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
