@@ -1,0 +1,211 @@
+.site-header {
+  background: var(--primary);
+  color: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.header-inner {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  padding: 0.75rem 0;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.25rem;
+  text-decoration: none;
+}
+
+.logo-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  background: var(--accent);
+  color: var(--primary);
+  font-weight: 800;
+  font-size: 0.75rem;
+  border-radius: 4px;
+}
+
+.main-nav {
+  display: flex;
+  gap: 1.25rem;
+  flex: 1;
+}
+
+.main-nav a {
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+  font-weight: 500;
+  padding: 0.25rem 0;
+  border-bottom: 2px solid transparent;
+}
+
+.main-nav a:hover,
+.main-nav a.active {
+  color: #fff;
+  border-bottom-color: var(--accent);
+}
+
+.header-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+/* Стили для кнопок в шапке - такие же как у навигации */
+.btn-login,
+.btn-logout,
+.profile-link {
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+  font-weight: 500;
+  padding: 0.25rem 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  font-size: 1rem;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+
+.btn-login:hover,
+.btn-logout:hover,
+.profile-link:hover {
+  color: #fff;
+  border-bottom-color: var(--accent);
+}
+
+/* Кнопка регистрации - акцентная */
+.btn-register {
+  display: inline-block;
+  padding: 0.4rem 0.75rem;
+  color: var(--primary);
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.btn-register:hover {
+  background: #ffd700;
+  border-color: #ffd700;
+}
+
+.site-footer {
+  background: #1a1a2e;
+  color: #ccc;
+  margin-top: auto;
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 2rem;
+  padding: 3rem 0 2rem;
+}
+
+.footer-grid h4 { color: #fff; margin-bottom: 0.75rem; }
+.footer-grid a { display: block; color: #aaa; text-decoration: none; margin-bottom: 0.35rem; }
+.footer-grid a:hover { color: #fff; }
+
+.footer-bottom {
+  border-top: 1px solid #333;
+  padding: 1rem 0;
+  text-align: center;
+  font-size: 0.875rem;
+}
+
+.admin-shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+.admin-sidebar {
+  width: 240px;
+  background: #1a1a2e;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+.admin-brand {
+  padding: 1.25rem;
+  font-weight: 700;
+  font-size: 1.1rem;
+  border-bottom: 1px solid #333;
+}
+
+.admin-nav {
+  display: flex;
+  flex-direction: column;
+  padding: 0.5rem 0;
+  flex: 1;
+}
+
+.admin-nav a {
+  color: #aaa;
+  text-decoration: none;
+  padding: 0.65rem 1.25rem;
+  font-size: 0.95rem;
+}
+
+.admin-nav a:hover,
+.admin-nav a.active {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.admin-sidebar-footer {
+  padding: 1rem 1.25rem;
+  border-top: 1px solid #333;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.admin-sidebar-footer a { color: #aaa; text-decoration: none; font-size: 0.875rem; }
+
+.admin-content {
+  flex: 1;
+  padding: 2rem;
+  background: #f5f6fa;
+  overflow: auto;
+}
+
+.admin-title { margin: 0 0 1.5rem; font-size: 1.75rem; }
+
+.admin-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.admin-header-row .admin-title { margin: 0; }
+
+.admin-section { margin-top: 2rem; }
+
+@media (max-width: 768px) {
+  .header-inner { flex-wrap: wrap; gap: 0.75rem; }
+  .main-nav { order: 3; width: 100%; flex-wrap: wrap; }
+  .admin-shell { flex-direction: column; }
+  .admin-sidebar { width: 100%; }
+}
