@@ -6,7 +6,6 @@ import com.warnabis.hotel_springboot_application.model.Room;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 public class RoomMapper {
@@ -36,7 +35,7 @@ public class RoomMapper {
         if (rooms == null) return List.of();
         return rooms.stream()
           .map(this::toResponseDto)
-          .collect(Collectors.toList());
+          .toList();
     }
 
     public void updateEntity(RoomRequestDto dto, Room room) {

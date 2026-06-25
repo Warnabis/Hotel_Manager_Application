@@ -2,6 +2,7 @@ package com.warnabis.hotel_springboot_application.exception;
 
 import tools.jackson.databind.exc.InvalidFormatException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.ConversionFailedException;
@@ -21,7 +22,9 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.sql.SQLIntegrityConstraintViolationException;
+import java.time.Clock;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeParseException;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -83,7 +86,7 @@ public class GlobalExceptionHandler {
         Map<String, String> errors = ex.getConstraintViolations().stream()
           .collect(Collectors.toMap(
             violation -> violation.getPropertyPath().toString(),
-            violation -> violation.getMessage(),
+            ConstraintViolation::getMessage,
             (first, second) -> first,
             LinkedHashMap::new
           ));
@@ -104,8 +107,7 @@ public class GlobalExceptionHandler {
         String message = "Некорректный формат JSON в теле запроса";
         Throwable cause = ex.getRootCause();
 
-        if (cause instanceof InvalidFormatException) {
-            InvalidFormatException ife = (InvalidFormatException) cause;
+        if (cause instanceof InvalidFormatException ife) {
             String fieldName = "неизвестное поле";
             if (!ife.getPath().isEmpty()) {
                 fieldName = ife.getPath().get(0).toString();
@@ -310,7 +312,7 @@ public class GlobalExceptionHandler {
       HttpServletRequest request,
       Map<String, String> validationErrors) {
         ErrorResponse body = ErrorResponse.builder()
-          .timestamp(LocalDateTime.now())
+          .timestamp(LocalDateTime.now(Clock.systemUTC()))
           .status(status.value())
           .error(status.getReasonPhrase())
           .message(message)

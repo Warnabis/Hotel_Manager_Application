@@ -6,8 +6,8 @@ import com.warnabis.hotel_springboot_application.model.Booking;
 import com.warnabis.hotel_springboot_application.model.Payment;
 import com.warnabis.hotel_springboot_application.model.Service;
 import org.springframework.stereotype.Component;
+
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 public class PaymentMapper {
@@ -34,12 +34,12 @@ public class PaymentMapper {
         if (payment.getBookings() != null) {
             dto.setBookingIds(payment.getBookings().stream()
               .map(Booking::getId)
-              .collect(Collectors.toList()));
+              .toList());
         }
         if (payment.getServices() != null) {
             dto.setServiceIds(payment.getServices().stream()
               .map(Service::getId)
-              .collect(Collectors.toList()));
+              .toList());
         }
         return dto;
     }
@@ -48,7 +48,7 @@ public class PaymentMapper {
         if (payments == null) return List.of();
         return payments.stream()
           .map(this::toResponseDto)
-          .collect(Collectors.toList());
+          .toList();
     }
 
     public void updateEntity(PaymentRequestDto dto, Payment payment) {

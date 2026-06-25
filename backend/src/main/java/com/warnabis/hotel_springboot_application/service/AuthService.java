@@ -25,6 +25,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class AuthService {
 
+    private static final String ROLE_GUEST = "GUEST";
+    private static final String ROLE_ADMIN = "ADMIN";
+
     private final GuestRepository guestRepository;
     private final GuestMapper guestMapper;
     private final PasswordEncoder passwordEncoder;
@@ -46,8 +49,8 @@ public class AuthService {
         guest.setPasswordHash(passwordEncoder.encode(request.getPassword()));
 
         Guest saved = guestRepository.save(guest);
-        String token = jwtService.generateToken(saved.getId(), saved.getEmail(), "GUEST");
-        return new AuthResponseDto(token, "GUEST", guestMapper.toResponseDto(saved));
+        String token = jwtService.generateToken(saved.getId(), saved.getEmail(), ROLE_GUEST);
+        return new AuthResponseDto(token, ROLE_GUEST, guestMapper.toResponseDto(saved));
     }
 
     @Transactional(readOnly = true)
@@ -64,16 +67,16 @@ public class AuthService {
             throw new BadRequestException("Неверный email или пароль");
         }
 
-        String token = jwtService.generateToken(guest.getId(), guest.getEmail(), "GUEST");
-        return new AuthResponseDto(token, "GUEST", guestMapper.toResponseDto(guest));
+        String token = jwtService.generateToken(guest.getId(), guest.getEmail(), ROLE_GUEST);
+        return new AuthResponseDto(token, ROLE_GUEST, guestMapper.toResponseDto(guest));
     }
 
     public AuthResponseDto adminLogin(AdminLoginRequestDto request) {
         if (!adminPassword.equals(request.getPassword())) {
             throw new BadRequestException("Неверный пароль администратора");
         }
-        String token = jwtService.generateToken(0, "admin@hotel.local", "ADMIN");
-        return new AuthResponseDto(token, "ADMIN", null);
+        String token = jwtService.generateToken(0, "admin@hotel.local", ROLE_ADMIN);
+        return new AuthResponseDto(token, ROLE_ADMIN, null);
     }
 
     public void deleteOwnAccount() {
