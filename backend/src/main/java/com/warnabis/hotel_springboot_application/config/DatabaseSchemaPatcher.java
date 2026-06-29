@@ -2,6 +2,7 @@ package com.warnabis.hotel_springboot_application.config;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -13,10 +14,11 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class DatabaseSchemaPatcher implements ApplicationRunner {
 
-    private static final String DEFAULT_GUEST_PASSWORD = "guest123";
-
     private final JdbcTemplate jdbcTemplate;
     private final PasswordEncoder passwordEncoder;
+
+    @Value("${ADMIN_PASSWORD}")
+    private String defaultGuestPassword;
 
     @Override
     public void run(ApplicationArguments args) {
@@ -33,7 +35,7 @@ public class DatabaseSchemaPatcher implements ApplicationRunner {
         );
 
         if (guestsWithoutPassword != null && guestsWithoutPassword > 0) {
-            String encodedPassword = passwordEncoder.encode(DEFAULT_GUEST_PASSWORD);
+            String encodedPassword = passwordEncoder.encode(defaultGuestPassword);
             int updated = jdbcTemplate.update(
               """
                 UPDATE guest
@@ -45,7 +47,7 @@ public class DatabaseSchemaPatcher implements ApplicationRunner {
             log.info(
               "Assigned default guest password to {} account(s). Use password: {}",
               updated,
-              DEFAULT_GUEST_PASSWORD
+              defaultGuestPassword
             );
         }
     }
