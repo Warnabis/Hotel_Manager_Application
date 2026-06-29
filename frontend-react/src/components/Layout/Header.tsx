@@ -23,7 +23,7 @@ export function Header() {
             {guest ? (
                 <>
                   <Link to="/profile" className="profile-link">
-                     {guest.fullName}
+                  {guest.fullName}
                   </Link>
                   <button type="button" className="btn-logout" onClick={logout}>
                     Выйти
